@@ -12,7 +12,9 @@ gdbscript = """
 """
 
 nc = ""
-def conn(*a, **kw): # default: local    R: remote    D: debug
+
+
+def conn(*a, **kw):  # default: local    R: remote    D: debug
     if args.R:
         addr = nc.split(" ")[1]
         port = int(nc.split(" ")[2])

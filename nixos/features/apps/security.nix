@@ -4,8 +4,8 @@
       pkgs.writers.writePython3Bin "ghidra-auto" {
         libraries = with pkgs.python3Packages; [click];
       } (builtins.replaceStrings
-        ["os.environ.get('GHIDRA_PATH', '/opt/ghidra/')"]
-        ["os.environ.get('GHIDRA_PATH', '${pkgs.ghidra}/lib/ghidra/')"]
+        [''"/opt/ghidra/"'']
+        [''"${pkgs.ghidra}/lib/ghidra/"'']
         (builtins.readFile ../../../assets/pwn/ghidra.py));
 
     pwninitGhidra = pkgs.writeShellScriptBin "pwninit-ghidra" (
