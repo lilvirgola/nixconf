@@ -1,5 +1,9 @@
-{
+{self, ...}: {
   flake.nixosModules.base = {pkgs, ...}: {
+    imports = [
+      self.nixosModules.zsh
+    ];
+
     nix.settings.experimental-features = ["nix-command" "flakes"];
 
     # Enable networking
@@ -73,7 +77,13 @@
       fzf
       unzip
       p7zip
+      rbw
+      bitwarden-cli
+      jq
     ];
+
+    # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK
+    programs.ssh.startAgent = true;
 
     # Enable direnv + nix-direnv for automatic per-project devShell loading
     programs.direnv = {
