@@ -12,6 +12,8 @@
     nixpkgs-multiverse.url = "github:fzakaria/nixpkgs-multiverse";
 
     vscode-server.url = "github:nix-community/nixos-vscode-server";
+
+    pwndbg.url = "github:pwndbg/pwndbg";
   };
 
   # Import all .nix files from current directory except flake.nix recursively

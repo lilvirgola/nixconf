@@ -56,3 +56,4 @@ direnv allow
 ```
 
 Because `programs.direnv` and `nix-direnv` are enabled in `base.nix`, your shell (and VS Code with the `mkhl.direnv` extension) will automatically enter the project's `devShell` whenever you `cd` into the directory!
+

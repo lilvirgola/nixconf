@@ -1,4 +1,4 @@
-{
+{inputs, ...}: {
   flake.nixosModules.security = {pkgs, ...}: {
     # Enables Wireshark with dumpcap permissions for users in the "wireshark" group
     programs.wireshark = {
@@ -16,7 +16,7 @@
 
       # Debuggers & Binary Exploitation (Pwn)
       gdb
-      pwndbg
+      inputs.pwndbg.packages.${pkgs.stdenv.hostPlatform.system}.default
       checksec
       patchelf
       binwalk
