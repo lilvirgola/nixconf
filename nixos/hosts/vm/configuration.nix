@@ -23,6 +23,11 @@
 
     networking.hostName = "nixos";
 
+    # Fix upside-down cursor in QEMU/virtio-gpu with wlroots compositors
+    environment.sessionVariables = {
+      WLR_NO_HARDWARE_CURSORS = "1";
+    };
+
     environment.systemPackages = with pkgs; [
       vscode
     ];
