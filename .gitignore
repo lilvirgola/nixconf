@@ -1,0 +1,14 @@
+# Nix build outputs
+result
+result-*
+
+# Direnv
+.direnv/
+.envrc.local
+
+# Editor & OS temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+
