@@ -2,11 +2,12 @@
 
 ## What Goes Here?
 
-This directory holds **flake-wide configuration, `flake-parts` setup, formatters, checks, and shared helper functions** that apply to the entire flake rather than a single NixOS host or desktop app.
+This directory holds **flake-wide configuration, `flake-parts` setup, formatters, checks, project templates, and shared helper functions** that apply to the entire flake rather than a single NixOS host or desktop app.
 
 ### Current Files
 - [`parts.nix`](./parts.nix): Declares the target architectures (`systems = [ "x86_64-linux" ... ];`) evaluated by `perSystem`.
 - [`fmt.nix`](./fmt.nix): Configures `pkgs.alejandra` as the flake formatter (`nix fmt`) and registers `checks.nix-fmt` so `nix flake check` verifies all `.nix` files are formatted.
+- [`templates.nix`](./templates.nix): Registers `flake.templates.{python-uv,go,rust}` pointing to [`../templates/`](../templates/).
 
 ### Rule of Thumb
 - Any `.nix` file placed here is automatically imported as a `flake-parts` module.

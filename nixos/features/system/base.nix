@@ -43,27 +43,63 @@
     users.users."virgola" = {
       isNormalUser = true;
       description = "Alessandro";
-      extraGroups = ["networkmanager" "wheel" "video" "audio"];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "video"
+        "audio"
+        "docker"
+        "wireshark"
+      ];
       packages = with pkgs; [];
     };
 
     # Allow unfree packages
     nixpkgs.config.allowUnfree = true;
 
-    # Base packages installed across all hosts
+    # Base packages and CLI power tools installed across all hosts
     environment.systemPackages = with pkgs; [
       vim
       wget
+      curl
       git
+      gh
       kitty
       alacritty
+      btop
+      fastfetch
+      ripgrep
+      fd
+      fzf
+      unzip
+      p7zip
     ];
 
-    # Enable the OpenSSH daemon and nix-ld
+    # Enable direnv + nix-direnv for automatic per-project devShell loading
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    # Enable the OpenSSH daemon and nix-ld with dynamic libraries for uv/Python wheels & foreign binaries
     services.openssh.enable = true;
     programs.nix-ld.enable = true;
     programs.nix-ld.libraries = with pkgs; [
-      # dynamic libs go here
+      stdenv.cc.cc
+      zlib
+      zstd
+      xz
+      bzip2
+      openssl
+      curl
+      glib
+      libGL
+      libxkbcommon
+      libxml2
+      sqlite
+      ncurses
+      expat
+      util-linux
     ];
 
     system.stateVersion = "26.05";

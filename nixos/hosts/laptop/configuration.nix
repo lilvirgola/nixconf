@@ -4,8 +4,13 @@
       self.nixosModules.laptopHardware
       self.nixosModules.base
       self.nixosModules.mangowm
+      self.nixosModules.wireguard
       self.nixosModules.laptopFeatures
       self.nixosModules.nvidia
+      self.nixosModules.desktopApps
+      self.nixosModules.dev
+      self.nixosModules.security
+      self.nixosModules.gaming
     ];
 
     networking.hostName = "laptop";

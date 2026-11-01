@@ -25,7 +25,11 @@
       && !lib.hasPrefix "_" file.name;
 
     importTree = path:
-      toList (fileFilter isNixModule path);
+      toList (
+        lib.fileset.difference
+        (fileFilter isNixModule path)
+        (lib.fileset.maybeMissing ./templates)
+      );
 
     mkFlake = inputs.flake-parts.lib.mkFlake {inherit inputs;};
   in

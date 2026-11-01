@@ -8,6 +8,10 @@
       self.nixosModules.vmHardware
       self.nixosModules.base
       self.nixosModules.mangowm
+      self.nixosModules.wireguard
+      self.nixosModules.desktopApps
+      self.nixosModules.dev
+      self.nixosModules.security
       inputs.vscode-server.nixosModules.default
     ];
 

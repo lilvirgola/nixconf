@@ -62,6 +62,9 @@
           "SUPER,r,reload_config"
           "SUPER,Return,spawn,${lib.getExe pkgs.kitty}"
           "SUPER,s,spawn,${lib.getExe self'.packages.myNoctalia} ipc call launcher toggle"
+          "SUPER+SHIFT,s,spawn,${pkgs.writeShellScript "screenshot" ''
+            ${lib.getExe pkgs.grim} -g "$(${lib.getExe pkgs.slurp})" - | ${lib.getExe pkgs.swappy} -f -
+          ''}"
           "SUPER,q,killclient,"
           "SUPER,m,quit"
           "SUPER,f,togglefullscreen,"
