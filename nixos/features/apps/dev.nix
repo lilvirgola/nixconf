@@ -10,8 +10,18 @@
       # Python & uv
       uv
       python3
+      python3Packages.pip
       ruff
       pyright
+
+      # PHP & Web development
+      php
+
+      # Java JDK (LTS 21)
+      jdk21
+
+      # Code Editors & IDEs
+      vscode
 
       # Go
       go
@@ -40,6 +50,7 @@
       ltex-ls-plus
 
       # Containers & Linux lab environments
+      docker-compose
       distrobox
 
       # Antigravity AI Development Platform & CLI

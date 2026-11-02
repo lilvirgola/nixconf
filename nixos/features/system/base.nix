@@ -1,5 +1,9 @@
 {self, ...}: {
-  flake.nixosModules.base = {pkgs, ...}: {
+  flake.nixosModules.base = {
+    pkgs,
+    lib,
+    ...
+  }: {
     imports = [
       self.nixosModules.zsh
     ];
@@ -143,7 +147,7 @@
     };
 
     # Enable the OpenSSH daemon and nix-ld with dynamic libraries for uv/Python wheels & foreign binaries
-    services.openssh.enable = true;
+    services.openssh.enable = lib.mkDefault true;
     programs.nix-ld.enable = true;
     programs.nix-ld.libraries = with pkgs; [
       stdenv.cc.cc

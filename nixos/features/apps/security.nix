@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  self,
+  inputs,
+  ...
+}: {
   flake.nixosModules.security = {pkgs, ...}: let
     ghidraAuto =
       pkgs.writers.writePython3Bin "ghidra-auto" {
@@ -26,27 +30,48 @@
       radare2
       imhex
 
-      # Debuggers & Binary Exploitation (Pwn)
+      # Debuggers, Binary Exploitation (Pwn) & Reverse Engineering
       gdb
       inputs.pwndbg.packages.${pkgs.stdenv.hostPlatform.system}.default
       pwninit
       pwninitGhidra
       python3Packages.pwntools
+      python3Packages.ropper
+      ropgadget
+      one_gadget
+      ruby
+      rubyPackages.seccomp-tools
       checksec
       patchelf
-      binwalk
+      elfutils
+      ht
       ltrace
       strace
       file
       unixtools.xxd
-      ropgadget
-      one_gadget
 
-      # Network & Web Security
+      # Steganography, File Analysis & Password Cracking
+      binwalk
+      stegsolve
+      john
+
+      # Network, Packet & Traffic Analysis
+      tshark
+      python3Packages.pyshark
       nmap
       netcat-gnu
-      gobuster
+
+      # Web Security, API Testing & Tunneling
       burpsuite
+      postman
+      gobuster
+      ngrok
+      self.packages.${pkgs.stdenv.hostPlatform.system}.tunnelmole
+
+      # Cryptography & Mathematical Analysis
+      sage
+      python3Packages.pycryptodome
+      self.packages.${pkgs.stdenv.hostPlatform.system}.mtp
     ];
   };
 }

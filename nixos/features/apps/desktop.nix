@@ -32,7 +32,8 @@
       telegram-desktop
       obsidian
 
-      # Files, PDFs, Thumbnails & Screenshots
+      # Files, PDFs, Graphics & Screenshots
+      gimp
       yazi
       zathura
       poppler-utils

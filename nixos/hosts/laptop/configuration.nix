@@ -15,6 +15,9 @@
 
     networking.hostName = "laptop";
 
+    # Disable SSH server daemon on laptop by default
+    services.openssh.enable = false;
+
     # UEFI Bootloader
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 10;
