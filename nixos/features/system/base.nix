@@ -94,9 +94,10 @@
       pulse.enable = true;
     };
 
-    # Define a user account. Don't forget to set a password with ‘passwd’.
+    # Define a user account with an initial default password ("nixos")
     users.users."virgola" = {
       isNormalUser = true;
+      initialPassword = "nixos";
       description = "Alessandro";
       extraGroups = [
         "networkmanager"
