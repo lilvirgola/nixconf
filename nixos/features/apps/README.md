@@ -15,6 +15,7 @@ Reusable NixOS modules (`flake.nixosModules.<name>`) for user-facing application
   - **Rust**: `rustup` (`cargo`, `rustc`, `rust-analyzer`, `clippy`, `rustfmt`)
   - **C/C++ & Build**: `gcc`, `clang`, `gnumake`, `cmake`, `pkg-config`, `ninja`
   - **Containers**: Docker (`virtualisation.docker.enable = true`) & `distrobox`
+  - **AI Development**: Antigravity IDE (`antigravity-ide-fhs`) & Antigravity CLI (`agy` via `antigravity-cli`)
 - [`security.nix`](./security.nix) (`flake.nixosModules.security`):
   - **Reverse Engineering**: Ghidra, Cutter, Rizin, Radare2, ImHex
   - **Pwn & Debugging**: `gdb`, `pwndbg` (run `pwndbg` directly in terminal), `checksec`, `patchelf`, `binwalk`, `ltrace`, `strace`, `file`, `xxd`, `ropgadget`, `one_gadget`

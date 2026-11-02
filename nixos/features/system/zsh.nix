@@ -64,6 +64,8 @@
         ghidra-auto = "ghidra-auto";
         pwninit = "pwninit-ghidra";
         s = "kitten ssh";
+        antigravity = "antigravity-ide";
+        agy = "agy";
         ssh-vault-save = "ssh-vault-add";
         ssh-vault-push = "ssh-vault-add";
         ssh-vault-ls = "ssh-vault-list";

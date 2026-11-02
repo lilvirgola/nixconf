@@ -55,6 +55,14 @@ ssh-vault-load id_ed25519            # (or run without arguments for default key
 
 ---
 
+## Antigravity AI Platform (IDE & CLI)
+
+Both the Antigravity IDE (FHS-wrapped for full extension and language-server compatibility) and Antigravity CLI are globally installed:
+- **Antigravity IDE**: Launch via application launcher or terminal with `antigravity-ide` (or alias `antigravity`).
+- **Antigravity CLI**: Launch with `agy` for terminal agent interactions and TUI pair programming.
+
+---
+
 ## Starting a Python (`uv`), Go, or Rust Project
 
 See [`templates/README.md`](./templates/README.md) for full details:

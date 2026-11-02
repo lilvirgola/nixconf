@@ -32,6 +32,10 @@
 
       # Containers & Linux lab environments
       distrobox
+
+      # Antigravity AI Development Platform & CLI
+      antigravity-ide-fhs
+      antigravity-cli
     ];
   };
 }
