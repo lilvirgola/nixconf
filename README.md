@@ -1,53 +1,168 @@
-# Virgola's NixOS Configuration
+# Virgola's NixOS Desktop & Security Suite
 
-A modular, multi-host NixOS flake structured around the **Dendritic Pattern** (`flake-parts`), using **MangoWM** (`mangowc`) and **Noctalia Shell** packaged via `nix-wrapper-modules`.
+[![NixOS Unstable](https://img.shields.io/badge/NixOS-unstable-blue.svg?logo=nixos&logoColor=white)](https://nixos.org)
+[![Architecture](https://img.shields.io/badge/Architecture-Dendritic%20Flake--Parts-7c5295.svg)](https://flake.parts)
+[![Compositor](https://img.shields.io/badge/Compositor-MangoWM%20(Wayland)-orange.svg)](https://github.com/BirdeeHub/nix-wrapper-modules)
+[![Shell](https://img.shields.io/badge/Shell-Noctalia%20v5-purple.svg)](https://github.com/BirdeeHub/nix-wrapper-modules)
+[![Theme](https://img.shields.io/badge/Palette-Catppuccin%20Mocha-f5c2e7.svg)](https://github.com/catppuccin/catppuccin)
+[![Formatter](https://img.shields.io/badge/Formatter-Alejandra-brightgreen.svg)](https://github.com/kamadorueda/alejandra)
+
+A modular, multi-host NixOS configuration built with the **Dendritic Pattern** (`flake-parts`), hermetic application wrappers (`nix-wrapper-modules`), and a complete engineering, security, and academic research workstation suite.
 
 ---
 
-## Architecture: The Dendritic Pattern
+## ⚡ Quickstart & Automated Machine Onboarding
 
-In this repository, **every `.nix` file is a `flake-parts` module** (except `flake.nix` itself, files prefixed with `_`, and standalone project templates under `templates/`).
-`flake.nix` recursively discovers and imports every `.nix` file in the directory tree automatically—so you never need to maintain a central list of file path imports.
+To provision a fresh physical laptop or virtual machine, run the interactive bootstrapper:
 
-### Directory Map (What Goes Where)
+```bash
+# Download and execute the bootstrapper:
+curl -sSL https://raw.githubusercontent.com/lilvirgola/nixconf/main/bootstrap.sh -o bootstrap.sh
+chmod +x bootstrap.sh && ./bootstrap.sh
+```
+
+The script will:
+1. Probe hardware and generate a clean `hardware.nix` via `nixos-generate-config`.
+2. Automatically back up any prior hardware scans.
+3. Prompt to set user passwords for `virgola`.
+4. Validate flake formatting and evaluation.
+5. Rebuild and activate the system with `sudo nixos-rebuild switch --flake .#<host>`.
+
+---
+
+## 🏛️ Architecture: The Dendritic Flake-Parts Pattern
+
+In this repository, **every `.nix` file is a self-contained module** (except `flake.nix` itself, files prefixed with `_`, and standalone project files in `templates/`).
+`flake.nix` uses recursive filesystem discovery to automatically import every module in the directory tree—eliminating central import lists and manual merge conflicts.
 
 ```text
 nixconf/
-├── flake.nix                  # Flake entrypoint & recursive module auto-importer
-├── lib/                       # Flake-wide settings: supported systems, formatter, checks, templates
-├── wrappedPrograms/           # Standalone programs wrapped via nix-wrapper-modules (MangoWM, Noctalia, Niri)
-├── packages/                  # Custom standalone derivations exposed under `perSystem.packages`
-├── templates/                 # Project devShell templates (`python-uv`, `go`, `rust`) for `nix flake init -t`
+├── flake.nix                  # Flake entrypoint & recursive module discovery engine
+├── bootstrap.sh               # Automated hardware generation & onboarding script
+├── lib/                       # Flake infrastructure: supported systems, Alejandra formatter, checks
+├── wrappedPrograms/           # Standalone wrapped applications (MangoWM, Noctalia, Niri)
+├── packages/                  # Custom flake packages (ninit, keyhints, mtp, tunnelmole)
+├── templates/                 # Project templates (python-uv, go, rust, latex)
 ├── nixos/
-│   ├── features/              # Reusable NixOS modules (`flake.nixosModules.<name>`)
-│   │   ├── system/            # Core OS, WireGuard, desktop/compositor, audio, laptop, Nvidia modules
-│   │   └── apps/              # Desktop apps, Dev (`uv`/Go/Rust/Docker), Security/RE, Gaming modules
-│   └── hosts/                 # Machine-specific configurations (`flake.nixosConfigurations.<host>`)
-│       ├── vm/                # QEMU/KVM Virtual Machine host (`#vm`)
-│       └── laptop/            # Physical Laptop host with UEFI, Nvidia, Gaming & power services (`#laptop`)
-└── .github/
-    ├── dependabot.yml         # Weekly updates for GitHub Actions
-    └── workflows/             # CI (`nix flake check`) & automated weekly `flake.lock` PRs
+│   ├── features/              # Composable NixOS capability modules
+│   │   ├── system/            # Base OS, desktop sessions, VPNs, power, audio, Nvidia
+│   │   └── apps/              # Daily desktop, developer stacks, security suite, gaming
+│   └── hosts/                 # Machine assemblies
+│       ├── laptop/            # Physical Laptop with UEFI, Nvidia, Blueman, SSH disabled (#laptop)
+│       └── vm/                # Virtual Machine with GRUB, QEMU/SPICE, SSH enabled (#vm)
+└── .github/                   # Automated CI verification and Dependabot updates
 ```
 
-Each folder contains its own `README.md` with copy-pasteable templates explaining what belongs in that directory.
+Each subdirectory contains its own dedicated [`README.md`](./nixos/README.md) detailing its architecture and module definitions.
 
 ---
 
-## SSH Key Management via Bitwarden / Vaultwarden
+## 🖥️ Desktop Experience: MangoWM + Noctalia v5
 
-SSH keys are managed securely in memory without keeping unencrypted private keys on disk:
+- **Wayland Compositor**: **MangoWM** (`mangowc`), featuring dynamic tiling (master/stack, grid, scroller), full floating toggles, and multi-monitor workspace management.
+- **Desktop Shell**: **Noctalia v5** configured as an elegant floating bar with rounded margins, system resource monitors, audio sliders, network management, battery gauges, and notification center.
+- **Theme**: Catppuccin Mocha aesthetic across SDDM, Kitty, Rofi, YAD, and GTK applications.
+- **Autostart Daemons**:
+  - `polkit-gnome`: Native GTK authentication modal for privileged operations.
+  - `wl-clip-persist`: Keeps copied clipboard text alive even after closing the source window.
+  - `swayidle`: Automatically locks the screen with Noctalia after 15 minutes (`900s`), suspends the machine after 30 minutes (`1800s`), and locks before system sleep.
+
+---
+
+## ⌨️ Interactive Keybindings Cheatsheet (`SUPER + H`)
+
+Never forget a shortcut: pressing **`SUPER + H`** launches the live **`keyhints`** interactive modal:
+
+- **Fuzzy Search & Action Launcher (`rofi`)**: Search any keybind by category, shortcut, or description. Pressing `Enter` on any application row immediately executes the action.
+- **Persistent Graphical Cheatsheet (`yad`)**: Selecting the top item or running `keyhints --table` / `keyhints -t` opens a floating 3-column GTK reference table that stays visible while you work.
+
+### Essential Keybindings
+
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `SUPER + H` | **Keybindings Cheatsheet** | Opens interactive searchable keyhints modal |
+| `SUPER + Return` | **Terminal** | Opens Kitty terminal emulator |
+| `SUPER + B` | **Web Browser** | Opens Firefox |
+| `SUPER + E` | **File Manager** | Opens Thunar file manager |
+| `SUPER + Space` | **Toggle Floating** | Switches active window between floating and tiled |
+| `SUPER + ALT + Space` | **Float All** | Floats all windows on current workspace |
+| `SUPER + F` | **Fullscreen** | Toggles fullscreen mode |
+| `SUPER + N` | **Cycle Layout** | Switches layout (tile / scroller / grid) |
+| `SUPER + Shift + S` | **Screenshot** | Interactive area screenshot with Swappy annotation |
+| `SUPER + 1..9` | **Workspaces** | Switch to workspace 1–9 |
+| `SUPER + Shift + 1..9`| **Move Window** | Move active window to workspace 1–9 |
+| `SUPER + U` | **Scratchpad** | Toggles dropdown scratchpad workspace |
+| `Ctrl + Alt + L` | **Lock Screen** | Locks session with Noctalia |
+| `Ctrl + Alt + P` | **Power Menu** | Opens power, suspend, and reboot menu |
+
+---
+
+## 🛠️ Security, Reverse Engineering & CTF Suite
+
+The configuration provides a complete offensive, defensive, and cryptanalysis laboratory:
+
+### Binary Exploitation (Pwn) & Debugging
+- **GDB & Pwndbg**: GDB with cutting-edge Pwndbg integration.
+- **Auto-Pwn Tooling**: `pwninit`, `pwninit-ghidra` (auto-generates exploit script with Ghidra decompilation stubs), `pwntools`.
+- **ROP & Gadgets**: `ropper`, `ropgadget`, `one_gadget` (finds libc one-gadget RCEs).
+- **Sandboxing & ELF**: `rubyPackages.seccomp-tools` (BPF filter inspector), `checksec`, `patchelf`, `elfutils` (`eu-readelf`, `eu-elfcmp`), `ltrace`, `strace`, `file`, `xxd`.
+
+### Reverse Engineering & Hex Editors
+- **Ghidra**: NSA software reverse engineering suite with JDK 21.
+- **Headless Scripts**: `ghidra-auto` for automated batch binary decompilation.
+- **Hex Editors**: `ht` (interactive PE/ELF/hex viewer), `rizin`, `radare2`, `imhex`.
+
+### Cryptography & Mathematics
+- **SageMath**: `sage` (SageMath 10.9) fetched precompiled from Nixpkgs binary cache—no 2-hour virtual machine source builds required!
+- **PyCryptodome**: Python 3 cryptographic primitives.
+- **MTP (Many-Time Pad)**: Interactive XOR key-reuse cryptanalysis solver (`packages/mtp.nix`). Run `mtp <ciphertexts.txt>`.
+
+### Network, Stego & Web Security
+- **Wireshark & Tshark**: GUI packet capture with non-root dumpcap permissions for user `virgola`, plus `tshark` CLI and `python3Packages.pyshark`.
+- **Steganography**: `binwalk` (firmware carving), `stegsolve` (visual bit plane analyzer), `john` (John the Ripper Jumbo).
+- **Web & Ingress**: `burpsuite`, `postman`, `ngrok`, `gobuster`, `nmap`.
+- **Tunnelmole (`tmole`)**: Open-source ngrok alternative (`packages/tunnelmole.nix`). Run `tmole 8080` to expose local servers with an instant public HTTPS URL.
+
+---
+
+## 🚀 Developer Toolchains & Templates (`ninit`)
+
+Scaffold new reproducible development environments with a single command:
 
 ```bash
-# 1. Add / save an SSH key to Bitwarden or Vaultwarden:
+# Launch interactive template picker:
+ninit
+
+# Or scaffold directly:
+ninit rust my-crate          # Rust with Cargo, rust-analyzer, clippy
+ninit py my-fastapi          # Python 3.14 with uv, ruff, pyright
+ninit go my-service          # Go with gopls, golangci-lint, delve
+ninit latex my-thesis        # LaTeX / LuaTeX with Tectonic, SyncTeX, Texlab
+```
+
+### Supported Stacks & Languages
+- **Python**: `uv` package manager with `UV_PYTHON_DOWNLOADS=automatic`, `python3Packages.pip`, `ruff`, `pyright`. Prebuilt C/C++ wheels run natively via `nix-ld`.
+- **PHP**: PHP 8.5 with standard extensions.
+- **Java**: OpenJDK 21 LTS (`jdk21`).
+- **LaTeX / Academic**: `tectonic` standalone compiler, `texliveMedium` (with `biber` & `chktex`), `texlab` LSP, `ltex-ls-plus`, and **Zathura SyncTeX** (Ctrl+Click in PDF navigates directly to LaTeX source code line).
+- **Containers**: Docker daemon (`virtualisation.docker.enable = true`), `docker-compose`, and `distrobox`.
+- **IDEs**: Visual Studio Code (`vscode`) and Antigravity AI IDE (`antigravity-ide`) with CLI agent (`agy`).
+
+---
+
+## 🔐 Bitwarden / Vaultwarden In-Memory SSH Agent
+
+Manage SSH keys securely in memory without keeping unencrypted private keys on disk:
+
+```bash
+# 1. Add / upload an SSH key to Bitwarden or Vaultwarden:
 ssh-vault-add                        # Uploads ~/.ssh/id_ed25519 as 'id_ed25519'
-ssh-vault-add ~/.ssh/id_rsa          # Uploads ~/.ssh/id_rsa as 'id_rsa'
 ssh-vault-add ~/.ssh/id_work work    # Uploads ~/.ssh/id_work as 'work'
 ssh-vault-add -g my_new_key          # Generates ~/.ssh/my_new_key and uploads it
-# (You will be asked if you want to remove the unencrypted private key from disk)
+# (You will be prompted to safely shred the unencrypted private key from disk)
 
-# 2. List keys in vault:
-ssh-vault-list                       # or 'ssh-vault-ls'
+# 2. List keys stored in your vault:
+ssh-vault-list
 
 # 3. Load a key on-demand into ssh-agent memory:
 ssh-vault-load id_ed25519            # (or run without arguments for default key)
@@ -55,62 +170,51 @@ ssh-vault-load id_ed25519            # (or run without arguments for default key
 
 ---
 
-## Antigravity AI Platform (IDE & CLI)
+## 🌐 WireGuard & Fortinet SSL VPN Suite
 
-Both the Antigravity IDE (FHS-wrapped for full extension and language-server compatibility) and Antigravity CLI are globally installed:
-- **Antigravity IDE**: Launch via application launcher or terminal with `antigravity-ide` (or alias `antigravity`).
-- **Antigravity CLI**: Launch with `agy` for terminal agent interactions and TUI pair programming.
+Both WireGuard and FortiGate SSL VPNs are supported out-of-the-box:
 
----
-
-## Starting a Python (`uv`), Go, or Rust Project
-
-See [`templates/README.md`](./templates/README.md) for full details:
-
-1. **Quick Global Workflow (Anywhere)**:
-   - **Python (`uv`)**: `uv init my-app && cd my-app && uv run main.py` (`nix-ld` is preconfigured so prebuilt C/C++ Python wheels work out-of-the-box)
-   - **Go**: `go mod init example.com/app && go run .`
-   - **Rust**: `rustup default stable` (once), then `cargo new my-app && cargo run`
-2. **Reproducible Flake + `direnv` Workflow**:
-   ```bash
-   mkdir my-project && cd my-project
-   nix flake init -t /home/virgola/nixconf#python-uv   # or #go or #rust
-   direnv allow
-   ```
-
----
-
-## Using WireGuard VPN
-
-Both `wireguard-tools` and NetworkManager's WireGuard support are enabled on all hosts:
 ```bash
-# Import a WireGuard .conf file into NetworkManager once:
+# WireGuard via NetworkManager:
 nmcli connection import type wireguard file ~/my-vpn.conf
-
-# Toggle the VPN tunnel on/off:
 nmcli connection up my-vpn
 nmcli connection down my-vpn
+
+# Fortinet SSL VPN via OpenFortiVPN CLI:
+sudo openfortivpn -c /etc/openfortivpn/config.example
 ```
-*(Or run `nm-connection-editor` for a GUI interface, or `sudo wg-quick up ~/my-vpn.conf`).*
+*(Or configure graphically via `nm-connection-editor` with the `networkmanager-openconnect` plugin).*
 
 ---
 
-## Common Commands
+## 🧹 System Hygiene & Maintenance
 
-### Rebuild a Host
+- **Automated Weekly Garbage Collection**: Automatically cleans store derivations older than 7 days (`nix.gc`).
+- **Store Deduplication**: Hardlinks duplicate files weekly (`nix.optimise`) and performs continuous deduplication (`auto-optimise-store = true`).
+- **Low-Disk Protection**: Prevents out-of-disk crashes during large builds with `min-free = 5 GiB` and `max-free = 10 GiB`.
+- **Boot Clutter Guard**: Caps bootloader generations at the last 10 versions on both GRUB and systemd-boot.
+
+---
+
+## 📋 Common Management Commands
+
 ```bash
-# On the VM:
-sudo nixos-rebuild switch --flake /home/virgola/nixconf#vm
+# Rebuild & activate the current machine:
+sudo nixos-rebuild switch --flake .#vm      # On VM
+sudo nixos-rebuild switch --flake .#laptop  # On Laptop
 
-# On the Laptop:
-sudo nixos-rebuild switch --flake /home/virgola/nixconf#laptop
-```
-
-### Format & Validate Flake
-```bash
-# Format all .nix files with Alejandra:
+# Format all Nix files with Alejandra:
 nix fmt .
 
-# Run all flake checks (formatting, wrapped program validation, NixOS evaluations):
+# Run flake validation suite:
 nix flake check .
+
+# Roll back to the previous generation:
+sudo nixos-rebuild switch --rollback
 ```
+
+---
+
+## 📄 License
+
+This repository is maintained by **Alessandro De Biasi** ([@lilvirgola](https://github.com/lilvirgola)) and is released under the **MIT License**.

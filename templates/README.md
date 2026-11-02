@@ -1,20 +1,43 @@
-# `templates/` — Project DevShell Templates (`uv`, `Go`, `Rust`)
+# `templates/` — Project DevShell Templates (`Python uv`, `Go`, `Rust`, `LaTeX`)
 
-## How to Start a New Project on NixOS
-
-Your system is configured with **two ways** to work on Python (`uv`), Go, and Rust projects:
+This directory houses reproducible, zero-friction project templates exposed via `flake.templates.<name>` and consumable with the automated `ninit` CLI tool or `nix flake init -t`.
 
 ---
 
-### Method 1: Instant Global Toolchains (Zero Nix Files Needed)
+## Three Ways to Start a Project on NixOS
 
-Because `uv`, `python3`, `go`, `rustup`, `gcc`, `pkg-config`, and `nix-ld` dynamic libraries are installed globally via [`nixos/features/apps/dev.nix`](../nixos/features/apps/dev.nix) and [`nixos/features/system/base.nix`](../nixos/features/system/base.nix), you can start projects anywhere just like on a traditional Linux distribution:
+### Method 1: Automated Scaffold (`ninit`) — Recommended!
+
+The fastest, recommended method to bootstrap a new repository:
+
+```bash
+# 1. Interactive picker with fzf:
+ninit
+
+# 2. Or specify template and project name directly:
+ninit rust my-crate          # Scaffolds Rust template in ./my-crate
+ninit py my-fastapi          # Scaffolds Python uv template in ./my-fastapi
+ninit go my-microservice     # Scaffolds Go template in ./my-microservice
+ninit latex my-thesis        # Scaffolds LaTeX/LuaTeX template in ./my-thesis
+```
+
+`ninit` handles all boilerplate automatically:
+1. Creates the target directory.
+2. Copies all template files (`flake.nix`, `.envrc`, `.gitignore`, boilerplate code).
+3. Initializes a Git repository with `git init`.
+4. Runs `direnv allow` so the isolated `devShell` activates instantly.
+
+---
+
+### Method 2: Instant Global Toolchains (Zero Nix Files Needed)
+
+Because `uv`, `python3`, `go`, `rustup`, `gcc`, `tectonic`, and `nix-ld` are installed globally in `dev.nix`, you can also create projects anywhere just like on traditional Linux:
 
 #### Python (`uv`)
 ```bash
 mkdir my-py && cd my-py
 uv init
-uv add requests numpy
+uv add requests fastapi
 uv run main.py
 ```
 
@@ -27,46 +50,35 @@ go run .
 
 #### Rust
 ```bash
-# First time only after installing NixOS:
+# First time setup (once):
 rustup default stable
 
-# For any new project:
 cargo new my-rust && cd my-rust
 cargo run
 ```
 
----
-
-### Method 2: Automated Initializer (`ninit` / `nix-template`)
-
-The fastest way to scaffold a new project with Git, Flake, and automatic `direnv` activation:
-
+#### LaTeX / Academic
 ```bash
-# Interactive selection with fzf:
-ninit
-
-# Or direct initialization:
-ninit rust my-cli
-ninit py my-data-app
-ninit go my-service
-ninit latex my-paper
+mkdir my-doc && cd my-doc
+cat << 'EOF' > main.tex
+\documentclass{article}
+\begin{document}
+Hello from Tectonic on NixOS!
+\end{document}
+EOF
+tectonic -X compile main.tex
 ```
 
-`ninit` automatically:
-1. Creates the target directory and copies the template
-2. Runs `git init` (if not already inside a git repo)
-3. Runs `direnv allow` for immediate environment activation
-
 ---
 
-### Method 3: Manual `nix flake init -t`
+### Method 3: Standard Flake Initialization (`nix flake init -t`)
 
-When you want to manually initialize a template:
+For manual flake initialization:
 
 ```bash
 mkdir my-project && cd my-project
 
-# Pick your language template:
+# Initialize from the local flake:
 nix flake init -t /home/virgola/nixconf#python-uv
 # OR
 nix flake init -t /home/virgola/nixconf#go
@@ -75,9 +87,35 @@ nix flake init -t /home/virgola/nixconf#rust
 # OR
 nix flake init -t /home/virgola/nixconf#latex
 
-# Activate automatic environment loading via direnv:
+# Activate devShell:
 direnv allow
 ```
 
-Because `programs.direnv` and `nix-direnv` are enabled in `base.nix`, your shell (and VS Code with the `mkhl.direnv` extension) will automatically enter the project's `devShell` whenever you `cd` into the directory!
+---
 
+## Template Details
+
+### 1. `python-uv` ([`templates/python-uv/`](./python-uv/))
+- **Tools**: Python 3.14, `uv`, `ruff`, `pyright`.
+- **Preconfigured**: `UV_PYTHON_DOWNLOADS=automatic` and `nix-ld` dynamic library bindings so binary wheels (NumPy, PyTorch, Pandas, Scipy) install and link without C-compiler compilation errors.
+
+### 2. `go` ([`templates/go/`](./go/))
+- **Tools**: Go 1.24+, `gopls` language server, `golangci-lint`, and `delve` debugger.
+- **Includes**: Clean `main.go`, `go.mod`, and `Makefile`.
+
+### 3. `rust` ([`templates/rust/`](./rust/))
+- **Tools**: `cargo`, `rustc`, `rust-analyzer`, `clippy`, and `rustfmt` managed with `rustup` or native toolchain.
+- **Includes**: Cargo configuration, boilerplate `src/main.rs`, and `.gitignore`.
+
+### 4. `latex` ([`templates/latex/`](./latex/))
+- **Tools**: `tectonic`, `texliveMedium` (with `biber` & `chktex`), `texlab` language server, `ltex-ls-plus`, and `zathura`.
+- **Live SyncTeX Bidirectional Sync**:
+  - Live compilation and continuous watching:
+    ```bash
+    tectonic -X watch --keep-intermediates --synctex
+    ```
+  - Open PDF with Zathura:
+    ```bash
+    zathura build/main.pdf &
+    ```
+  - Hold `Ctrl` and click any text inside Zathura to jump directly to the exact source file and line in your editor!

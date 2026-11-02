@@ -1,25 +1,90 @@
 # `nixos/features/apps/` — Application Feature Modules
 
-## What Goes Here?
+This directory contains reusable application and developer suites (`flake.nixosModules.<name>`).
 
-Reusable NixOS modules (`flake.nixosModules.<name>`) for user-facing applications, development stacks, security/reverse-engineering tools, and gaming setups.
+---
 
-### Current Modules
-- [`desktop.nix`](./desktop.nix) (`flake.nixosModules.desktopApps`):
-  - **Web & Comms**: Firefox, Vesktop (Wayland Discord), Telegram Desktop, Obsidian
-  - **Media & Audio**: Spotify, MPV, VLC, Pavucontrol
-  - **Files, Docs & Screenshots**: Thunar, Yazi, Zathura, `grim` + `slurp` + `swappy` (`SUPER+SHIFT+S` in MangoWM)
-- [`dev.nix`](./dev.nix) (`flake.nixosModules.dev`):
-  - **Python**: `uv`, `python3`, `ruff`, `pyright` (with `UV_PYTHON_DOWNLOADS=automatic` + `nix-ld`)
-  - **Go**: `go`, `gopls`, `golangci-lint`, `delve`
-  - **Rust**: `rustup` (`cargo`, `rustc`, `rust-analyzer`, `clippy`, `rustfmt`)
-  - **C/C++ & Build**: `gcc`, `clang`, `gnumake`, `cmake`, `pkg-config`, `ninja`
-  - **Containers**: Docker (`virtualisation.docker.enable = true`) & `distrobox`
-  - **AI Development**: Antigravity IDE (`antigravity-ide-fhs`) & Antigravity CLI (`agy` via `antigravity-cli`)
-- [`security.nix`](./security.nix) (`flake.nixosModules.security`):
-  - **Reverse Engineering**: Ghidra, Cutter, Rizin, Radare2, ImHex
-  - **Pwn & Debugging**: `gdb`, `pwndbg` (run `pwndbg` directly in terminal), `checksec`, `patchelf`, `binwalk`, `ltrace`, `strace`, `file`, `xxd`, `ropgadget`, `one_gadget`
-  - **Network & Web**: Wireshark (with non-root packet capture via `wireshark` group), `nmap`, `netcat`, `gobuster`, `burpsuite`
-- [`gaming.nix`](./gaming.nix) (`flake.nixosModules.gaming`):
-  - **Steam**: `programs.steam` with Proton-GE, Gamescope session, and `nix-gaming` platform optimizations
-  - **Launchers & Utilities**: Heroic Games Launcher, GameMode, MangoHud, Protontricks
+## 1. `dev.nix` (`flake.nixosModules.dev`)
+
+Complete multi-language developer stack, container engines, and documentation compilers:
+
+### Languages & Runtimes
+- **Python**: `python3`, `uv` (fast Python package manager with `UV_PYTHON_DOWNLOADS=automatic`), `python3Packages.pip`, `ruff` (linter/formatter), `pyright` (LSP). Prebuilt C/C++ Python wheels work out-of-the-box thanks to `nix-ld`.
+- **PHP**: PHP 8.5 with standard extensions.
+- **Java**: OpenJDK 21 LTS (`pkgs.jdk21`).
+- **Go**: `go`, `gopls`, `golangci-lint`, `delve`.
+- **Rust**: `rustup` managing `rustc`, `cargo`, `rust-analyzer`, `clippy`, and `rustfmt`.
+- **C/C++**: `gcc`, `clang`, `gnumake`, `cmake`, `pkg-config`, `ninja`.
+
+### LaTeX & Academic Publishing
+- **TeX Live Suite**: `texliveMedium` bundled with `biber` (bibliography) and `chktex` (linter).
+- **Compilers & Language Servers**: `tectonic` (modern standalone LaTeX engine), `texlab` (LSP), and `ltex-ls-plus` (grammar & spell check).
+- **SyncTeX Bidirectional Sync**: Configured between Zathura and editors (`Ctrl+Click` in PDF navigates directly to LaTeX source line).
+
+### Containers & Editors
+- **Docker Engine**: `virtualisation.docker.enable = true` + `docker-compose`. User `virgola` has non-root Docker access.
+- **Distrobox**: Launch arbitrary Linux distributions (Ubuntu, Fedora, Arch) inside your terminal.
+- **Visual Studio Code**: `pkgs.vscode` with extensions and remote support.
+- **Antigravity AI Platform**: FHS-wrapped `antigravity-ide` and CLI agent `agy`.
+
+---
+
+## 2. `security.nix` (`flake.nixosModules.security`)
+
+Comprehensive Cyber Security, Binary Exploitation (Pwn), Reverse Engineering, Cryptography, and Steganography suite:
+
+### Binary Exploitation (Pwn) & Debugging
+- **GDB & Pwndbg**: Standard `gdb` paired with cutting-edge `pwndbg` from flake inputs.
+- **Exploitation Utilities**:
+  - `pwninit`: Auto-patches glibc, downloads symbols, and stubs exploit scripts.
+  - `pwninit-ghidra`: Automated wrapper that stubs `solve.py` with Ghidra headless decompilation.
+  - `python3Packages.pwntools`: The premier Python binary exploitation framework.
+  - `python3Packages.ropper` & `ropgadget`: ROP/JOP/SYS gadget finders.
+  - `one_gadget`: Best tool for finding `execve("/bin/sh")` one-gadgets in `libc.so.6`.
+  - `rubyPackages.seccomp-tools`: Disassembler and inspector for Linux kernel BPF seccomp sandbox filters.
+  - `checksec`, `patchelf`, `elfutils` (`eu-readelf`, `eu-elfcmp`), `ltrace`, `strace`, `file`, `xxd`.
+
+### Reverse Engineering & Hex Editors
+- **Ghidra**: NSA software reverse engineering suite with JDK 21 runtime.
+- **Headless Automation**: `ghidra-auto` for automated batch binary decompilation.
+- **Hex & Binary Editors**: `ht` (interactive PE/ELF/hex viewer), `rizin`, `radare2`, `imhex`.
+
+### Steganography & Password Cracking
+- **Binwalk**: Firmware analysis, extraction, and file signature carving.
+- **Stegsolve**: Visual steganography analyzer and bit plane extractor.
+- **John the Ripper**: `john` (Jumbo suite) for cracking hashes, archives, and keys.
+
+### Network Security & Traffic Analysis
+- **Wireshark**: GUI packet analyzer with non-root packet capture permissions for user `virgola`.
+- **Tshark**: Wireshark CLI packet analysis suite (`tshark`, `dumpcap`, `mergecap`).
+- **Pyshark**: Python packet parsing wrapper for Tshark.
+- **Scanning & Discovery**: `nmap`, `netcat-gnu`, `gobuster`.
+
+### Web Security & Ingress Tunneling
+- **Burp Suite Community**: Web vulnerability assessment and proxy.
+- **Postman**: API development, inspection, and testing platform.
+- **Ngrok**: Secure introspection tunnels to expose local servers.
+- **Tunnelmole (`tmole`)**: Open-source ngrok alternative packaged in `packages/tunnelmole.nix`. Run `tmole <port>` to get instant public HTTPS URLs.
+
+### Cryptography & Mathematics
+- **SageMath**: `sage` (SageMath 10.9) precompiled and cached from Nixpkgs Hydra—no 2-hour virtual machine source builds required!
+- **PyCryptodome**: `python3Packages.pycryptodome` for modern cryptography in Python.
+- **MTP (Many-Time Pad)**: Interactive XOR key-reuse cryptanalysis solver (`packages/mtp.nix`). Run `mtp <ciphertexts.txt>`.
+
+---
+
+## 3. `desktop.nix` (`flake.nixosModules.desktopApps`)
+
+Essential daily productivity, graphics, media, and document applications:
+- **Web & Communication**: Firefox, Vesktop (Discord Wayland client with screensharing and rich presence), Telegram Desktop, Obsidian.
+- **Graphics & Media**: GIMP 3, Spotify, VLC, MPV, Pavucontrol (audio control).
+- **File Management**: Thunar with archive and volume plugins, `gvfs` (trash and auto-mounting), `tumbler` (thumbnails), `programs.dconf` (GTK dark themes), Yazi terminal file manager.
+- **PDFs & Screenshots**: Zathura with SyncTeX, `poppler-utils`, `grim`, `slurp`, and `swappy` (`SUPER + SHIFT + S`).
+
+---
+
+## 4. `gaming.nix` (`flake.nixosModules.gaming`)
+
+Dedicated gaming optimizations:
+- **Steam**: Valve Steam with Proton-GE and Gamescope compatibility.
+- **GameMode**: Feral Interactive GameMode for dynamic CPU/GPU governor scheduling.
