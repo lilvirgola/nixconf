@@ -4,7 +4,51 @@
       self.nixosModules.zsh
     ];
 
-    nix.settings.experimental-features = ["nix-command" "flakes"];
+    # Automated Nix store garbage collection, deduplication, and low-disk guards
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+
+    nix.optimise = {
+      automatic = true;
+      dates = ["weekly"];
+    };
+
+    nix.settings = {
+      experimental-features = ["nix-command" "flakes"];
+      auto-optimise-store = true;
+      min-free = 5 * 1024 * 1024 * 1024; # 5 GiB
+      max-free = 10 * 1024 * 1024 * 1024; # 10 GiB
+    };
+
+    # Polkit authorization framework
+    security.polkit.enable = true;
+
+    # GNOME Keyring & Secret Service for storing credentials in VS Code, Git, and browsers
+    services.gnome.gnome-keyring.enable = true;
+    services.gnome.gcr-ssh-agent.enable = false;
+    security.pam.services.sddm.enableGnomeKeyring = true;
+    security.pam.services.login.enableGnomeKeyring = true;
+
+    # System-wide fonts: Noto Color Emoji, CJK ideographs, and fontconfig fallbacks
+    fonts = {
+      packages = with pkgs; [
+        noto-fonts
+        noto-fonts-cjk-sans
+        noto-fonts-color-emoji
+      ];
+      fontconfig = {
+        enable = true;
+        defaultFonts = {
+          monospace = ["JetBrains Mono Nerd Font" "Noto Color Emoji"];
+          sansSerif = ["Noto Sans" "Noto Color Emoji"];
+          serif = ["Noto Serif" "Noto Color Emoji"];
+          emoji = ["Noto Color Emoji"];
+        };
+      };
+    };
 
     # ZRAM compressed in-memory swap to prevent OOM during builds
     zramSwap.enable = true;

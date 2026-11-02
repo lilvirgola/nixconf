@@ -8,7 +8,20 @@
     packages.myMango = inputs.wrapper-modules.wrappers.mangowc.wrap {
       inherit pkgs;
       autostart_sh = ''
+        # Desktop shell
         ${lib.getExe self'.packages.myNoctalia} &
+
+        # Polkit graphical authentication agent
+        ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
+
+        # Clipboard persistence (keeps copied items after closing window)
+        ${lib.getExe pkgs.wl-clip-persist} --clipboard both &
+
+        # Inactivity auto-locker and sleep (15 min lock, 30 min suspend)
+        ${lib.getExe pkgs.swayidle} -w \
+          timeout 900 '${lib.getExe self'.packages.myNoctalia} msg session lock' \
+          timeout 1800 'systemctl suspend' \
+          before-sleep '${lib.getExe self'.packages.myNoctalia} msg session lock' &
       '';
       settings = {
         # Keyboard layout matching Italian keymap
