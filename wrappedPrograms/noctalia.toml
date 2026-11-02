@@ -1,0 +1,59 @@
+[theme]
+mode = "dark"
+source = "builtin"
+builtin = "Noctalia"
+
+[bar]
+order = [ "default" ]
+
+    [bar.default]
+    enabled = true
+    position = "top"
+    reserve_space = true
+    layer = "top"
+    thickness = 34
+    widget_spacing = 6
+    radius = 12
+    background_opacity = 0.93
+    start = [ "launcher", "active_window" ]
+    center = [ "workspaces" ]
+    end = [ "media", "tray", "volume", "network", "bluetooth", "clock", "control-center", "session" ]
+
+[widget.workspaces]
+type = "workspaces"
+labels_only_when_occupied = false
+hide_when_empty = false
+show_labels = true
+label_source = "id"
+
+[widget.launcher]
+type = "launcher"
+
+[widget.active_window]
+type = "active_window"
+
+[widget.clock]
+type = "clock"
+format = "{:%H:%M  %a, %b %d}"
+
+[widget.tray]
+type = "tray"
+
+[widget.volume]
+type = "volume"
+
+[widget.network]
+type = "network"
+
+[widget.bluetooth]
+type = "bluetooth"
+
+[widget.control-center]
+type = "control-center"
+
+[widget.session]
+type = "session"
+
+[widget.media]
+type = "media"
+

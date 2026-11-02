@@ -67,17 +67,17 @@
         # Comprehensive Keybindings (JaKooLit Hyprland Parity)
         bind = [
           # App Launchers & Default Applications
-          "SUPER,d,spawn,${lib.getExe self'.packages.myNoctalia} ipc call launcher toggle"
-          "SUPER,s,spawn,${lib.getExe self'.packages.myNoctalia} ipc call launcher toggle"
+          "SUPER,d,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher"
+          "SUPER,s,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher"
           "SUPER,Return,spawn,${lib.getExe pkgs.kitty}"
           "SUPER,b,spawn,${lib.getExe pkgs.firefox}"
           "SUPER,e,spawn,${lib.getExe pkgs.thunar}"
-          "SUPER+ALT,v,spawn,${lib.getExe self'.packages.myNoctalia} ipc call launcher clipboard"
-          "SUPER+ALT,c,spawn,${lib.getExe self'.packages.myNoctalia} ipc call launcher calculator"
-          "SUPER+SHIFT,n,spawn,${lib.getExe self'.packages.myNoctalia} ipc call controlCenter toggle"
-          "SUPER+SHIFT,e,spawn,${lib.getExe self'.packages.myNoctalia} ipc call sessionMenu toggle"
-          "CTRL+ALT,p,spawn,${lib.getExe self'.packages.myNoctalia} ipc call sessionMenu toggle"
-          "CTRL+ALT,l,spawn,${lib.getExe self'.packages.myNoctalia} ipc call lockScreen lock"
+          "SUPER+ALT,v,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle clipboard"
+          "SUPER+ALT,c,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher"
+          "SUPER+SHIFT,n,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle control-center"
+          "SUPER+SHIFT,e,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle session"
+          "CTRL+ALT,p,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle session"
+          "CTRL+ALT,l,spawn,${lib.getExe self'.packages.myNoctalia} msg session lock"
 
           # Window Control & Layouts
           "SUPER,q,killclient"
