@@ -22,7 +22,7 @@
       "frameRadius": 12,
       "outerCorners": true,
       "hideOnOverview": false,
-      "displayMode": "non_exclusive",
+      "displayMode": "always_visible",
       "autoHideDelay": 500,
       "autoShowDelay": 150,
       "showOnWorkspaceSwitch": true,

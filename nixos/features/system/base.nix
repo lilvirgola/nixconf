@@ -80,6 +80,8 @@
       rbw
       bitwarden-cli
       jq
+      playerctl
+      brightnessctl
     ];
 
     # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK
