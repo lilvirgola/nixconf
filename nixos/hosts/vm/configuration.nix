@@ -28,11 +28,6 @@
 
     networking.hostName = "nixos";
 
-    # Automatic login directly into MangoWM for the VM test runner
-    services.displayManager.autoLogin.enable = true;
-    services.displayManager.autoLogin.user = "virgola";
-    services.displayManager.defaultSession = "mango";
-
     # Fix upside-down cursor in QEMU/virtio-gpu with wlroots compositors
     environment.sessionVariables = {
       WLR_NO_HARDWARE_CURSORS = "1";
