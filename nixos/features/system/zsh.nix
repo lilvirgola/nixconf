@@ -66,6 +66,8 @@
         s = "kitten ssh";
         antigravity = "antigravity-ide";
         agy = "agy";
+        ninit = "ninit";
+        nix-template = "ninit";
         ssh-vault-save = "ssh-vault-add";
         ssh-vault-push = "ssh-vault-add";
         ssh-vault-ls = "ssh-vault-list";

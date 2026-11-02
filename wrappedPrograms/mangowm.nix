@@ -21,27 +21,25 @@
         tap_and_drag = 1;
         drag_lock = 1;
         trackpad_disable_while_typing = 1;
-        sloppyfocus = 1;
-        warpcursor = 1;
+        sloppy_focus = 1;
+        warp_cursor = 1;
 
         # Visuals & window aesthetics (harmonized with Catppuccin / Noctalia)
         blur = 1;
         blur_optimized = 1;
-        blur_params = {
-          radius = 5;
-          num_passes = 2;
-        };
+        blur_params_radius = 5;
+        blur_params_num_passes = 2;
         border_radius = 8;
-        gappih = 5;
-        gappiv = 5;
-        gappoh = 10;
-        gappov = 10;
-        borderpx = 2;
-        focuscolor = "0x89b4faff";
-        bordercolor = "0x313244ff";
-        urgentcolor = "0xf38ba8ff";
-        maximizescreencolor = "0xa6e3a1ff";
-        scratchpadcolor = "0xf9e2afff";
+        gap_inner_horizontal = 5;
+        gap_inner_vertical = 5;
+        gap_outer_horizontal = 10;
+        gap_outer_vertical = 10;
+        border_px = 2;
+        focus_color = "0x89b4faff";
+        border_color = "0x313244ff";
+        urgent_color = "0xf38ba8ff";
+        maximized_screen_color = "0xa6e3a1ff";
+        scratchpad_color = "0xf9e2afff";
 
         # Animations
         animations = 1;
@@ -52,7 +50,7 @@
         animation_duration_close = 800;
 
         # Tag rules (workspaces 1-9)
-        tagrule = [
+        tag_rule = [
           "id:1,layout_name:tile"
           "id:2,layout_name:tile"
           "id:3,layout_name:tile"
@@ -165,12 +163,8 @@
           "SUPER+CTRL,9,tagsilent,9,0"
 
           # Next / Previous Workspace Cycle
-          "SUPER,bracketleft,viewtoleft"
-          "SUPER,bracketright,viewtoright"
           "SUPER,comma,viewtoleft"
           "SUPER,period,viewtoright"
-          "SUPER+SHIFT,bracketleft,tagtoleft"
-          "SUPER+SHIFT,bracketright,tagtoright"
 
           # Special Workspace (Scratchpad)
           "SUPER,u,toggle_special_tag"
@@ -197,7 +191,6 @@
 
           # Media Player Controls (playerctl)
           "none,XF86AudioPlay,spawn,playerctl play-pause"
-          "none,XF86AudioPause,spawn,playerctl play-pause"
           "none,XF86AudioNext,spawn,playerctl next"
           "none,XF86AudioPrev,spawn,playerctl previous"
           "none,XF86AudioStop,spawn,playerctl stop"

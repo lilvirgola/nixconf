@@ -22,7 +22,6 @@
       # Decompilers, Disassemblers & Hex Editors
       ghidra
       ghidraAuto
-      cutter
       rizin
       radare2
       imhex

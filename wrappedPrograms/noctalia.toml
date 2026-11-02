@@ -12,8 +12,14 @@ order = [ "default" ]
     reserve_space = true
     layer = "top"
     thickness = 34
+    margin_edge = 8
+    margin_ends = 16
+    margin_opposite_edge = 0
+    padding = 12
     widget_spacing = 6
     radius = 12
+    concave_edge_corners = false
+    shadow = true
     background_opacity = 0.93
     start = [ "launcher", "active_window" ]
     center = [ "workspaces" ]
@@ -57,3 +63,8 @@ type = "session"
 [widget.media]
 type = "media"
 
+[wallpaper]
+enabled = true
+
+[wallpaper.default]
+path = "@ASTRONAUT_WALLPAPER@"

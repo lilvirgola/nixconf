@@ -30,6 +30,15 @@
       pkg-config
       ninja
 
+      # LaTeX & LuaTeX toolchain
+      (texliveMedium.withPackages (ps: [
+        ps.biber
+        ps.chktex
+      ]))
+      tectonic
+      texlab
+      ltex-ls-plus
+
       # Containers & Linux lab environments
       distrobox
 

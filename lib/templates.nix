@@ -12,5 +12,9 @@
       path = ../templates/rust;
       description = "Rust project with cargo, rustc, rust-analyzer, clippy, and rustfmt";
     };
+    latex = {
+      path = ../templates/latex;
+      description = "LaTeX and LuaTeX project with TeX Live Full, tectonic, texlab, and zathura";
+    };
   };
 }

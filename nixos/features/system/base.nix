@@ -6,6 +6,9 @@
 
     nix.settings.experimental-features = ["nix-command" "flakes"];
 
+    # ZRAM compressed in-memory swap to prevent OOM during builds
+    zramSwap.enable = true;
+
     # Enable networking
     networking.networkmanager.enable = true;
 
@@ -82,6 +85,7 @@
       jq
       playerctl
       brightnessctl
+      self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
     ];
 
     # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK

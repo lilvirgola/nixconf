@@ -37,9 +37,31 @@ cargo run
 
 ---
 
-### Method 2: Reproducible Per-Project Flake + `direnv`
+### Method 2: Automated Initializer (`ninit` / `nix-template`)
 
-When a project needs project-specific system C libraries, pinned compiler versions, or a team-reproducible `flake.nix`, initialize one of the templates in this folder:
+The fastest way to scaffold a new project with Git, Flake, and automatic `direnv` activation:
+
+```bash
+# Interactive selection with fzf:
+ninit
+
+# Or direct initialization:
+ninit rust my-cli
+ninit py my-data-app
+ninit go my-service
+ninit latex my-paper
+```
+
+`ninit` automatically:
+1. Creates the target directory and copies the template
+2. Runs `git init` (if not already inside a git repo)
+3. Runs `direnv allow` for immediate environment activation
+
+---
+
+### Method 3: Manual `nix flake init -t`
+
+When you want to manually initialize a template:
 
 ```bash
 mkdir my-project && cd my-project
@@ -50,6 +72,8 @@ nix flake init -t /home/virgola/nixconf#python-uv
 nix flake init -t /home/virgola/nixconf#go
 # OR
 nix flake init -t /home/virgola/nixconf#rust
+# OR
+nix flake init -t /home/virgola/nixconf#latex
 
 # Activate automatic environment loading via direnv:
 direnv allow

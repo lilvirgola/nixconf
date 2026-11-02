@@ -2,7 +2,8 @@
   perSystem = {pkgs, ...}: let
     configDir = pkgs.runCommand "noctalia-config-dir" {} ''
       mkdir -p $out/noctalia
-      cp ${./noctalia.toml} $out/noctalia/config.toml
+      substitute ${./noctalia.toml} $out/noctalia/config.toml \
+        --replace-fail "@ASTRONAUT_WALLPAPER@" "${pkgs.sddm-astronaut}/share/sddm/themes/sddm-astronaut-theme/Backgrounds/astronaut.png"
     '';
 
     wrappedNoctalia =
