@@ -76,6 +76,7 @@
           "SUPER+SHIFT,e,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle session"
           "CTRL+ALT,p,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle session"
           "CTRL+ALT,l,spawn,${lib.getExe self'.packages.myNoctalia} msg session lock"
+          "SUPER,h,spawn,${lib.getExe self'.packages.keyhints}"
 
           # Window Control & Layouts
           "SUPER,q,killclient"
@@ -95,7 +96,6 @@
           "SUPER,Right,focusdir,right"
           "SUPER,Up,focusdir,up"
           "SUPER,Down,focusdir,down"
-          "SUPER,h,focusdir,left"
           "SUPER,l,focusdir,right"
           "SUPER,k,focusdir,up"
           "SUPER,j,focusdir,down"

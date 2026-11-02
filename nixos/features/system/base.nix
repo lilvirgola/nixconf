@@ -86,6 +86,7 @@
       playerctl
       brightnessctl
       self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
+      self.packages.${pkgs.stdenv.hostPlatform.system}.keyhints
     ];
 
     # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK

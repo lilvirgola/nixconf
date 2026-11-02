@@ -68,6 +68,8 @@
         agy = "agy";
         ninit = "ninit";
         nix-template = "ninit";
+        keyhints = "keyhints";
+        keys = "keyhints";
         ssh-vault-save = "ssh-vault-add";
         ssh-vault-push = "ssh-vault-add";
         ssh-vault-ls = "ssh-vault-list";
