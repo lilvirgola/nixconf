@@ -6,7 +6,7 @@ System-level NixOS modules (`flake.nixosModules.<name>`) covering OS basics, dis
 
 ### Current Modules
 - [`base.nix`](./base.nix) (`flake.nixosModules.base`): Imports `zsh`, locale (`Europe/Rome`, Italian keymap), PipeWire audio, user `virgola`, OpenSSH, `direnv` + `nix-direnv`, `nix-ld` with dynamic libraries, and CLI power tools (`git`, `gh`, `btop`, `fastfetch`, `ripgrep`, `fd`, `fzf`, `unzip`, `p7zip`).
-- [`zsh.nix`](./zsh.nix) (`flake.nixosModules.zsh`): Configures Zsh as the default user shell, Oh-My-Zsh with `agnosterzak` theme, plugins, autosuggestions, syntax highlighting, history, aliases (`lsd`, python, pwninit, kitty), and Nerd Fonts.
+- [`zsh.nix`](./zsh.nix) (`flake.nixosModules.zsh`): Configures Zsh as the default user shell, Oh-My-Zsh with `agnosterzak` theme, plugins, autosuggestions, syntax highlighting, history, aliases (`lsd`, python, pwninit, kitty), Nerd Fonts, and Bitwarden/Vaultwarden SSH key utilities (`ssh-vault-add`, `ssh-vault-load`, `ssh-vault-list`).
 - [`wireguard.nix`](./wireguard.nix) (`flake.nixosModules.wireguard`): Installs `wireguard-tools` and `networkmanagerapplet` (`nm-applet` / `nm-connection-editor`), and sets `networking.firewall.checkReversePath = "loose"` for WireGuard client tunnels.
 - [`noctalia.nix`](./noctalia.nix) (`flake.nixosModules.noctalia`): Installs `myNoctalia` and enables D-Bus, UPower, `power-profiles-daemon`, `gtk3` (`gtk-launch`), `xdg-utils`, and clipboard tools.
 - [`mangowm.nix`](./mangowm.nix) (`flake.nixosModules.mangowm`): Imports `noctalia`, enables SDDM (Wayland), and enables `programs.mango` with the wrapped `myMango` package.

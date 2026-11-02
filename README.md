@@ -34,6 +34,27 @@ Each folder contains its own `README.md` with copy-pasteable templates explainin
 
 ---
 
+## SSH Key Management via Bitwarden / Vaultwarden
+
+SSH keys are managed securely in memory without keeping unencrypted private keys on disk:
+
+```bash
+# 1. Add / save an SSH key to Bitwarden or Vaultwarden:
+ssh-vault-add                        # Uploads ~/.ssh/id_ed25519 as 'id_ed25519'
+ssh-vault-add ~/.ssh/id_rsa          # Uploads ~/.ssh/id_rsa as 'id_rsa'
+ssh-vault-add ~/.ssh/id_work work    # Uploads ~/.ssh/id_work as 'work'
+ssh-vault-add -g my_new_key          # Generates ~/.ssh/my_new_key and uploads it
+# (You will be asked if you want to remove the unencrypted private key from disk)
+
+# 2. List keys in vault:
+ssh-vault-list                       # or 'ssh-vault-ls'
+
+# 3. Load a key on-demand into ssh-agent memory:
+ssh-vault-load id_ed25519            # (or run without arguments for default key)
+```
+
+---
+
 ## Starting a Python (`uv`), Go, or Rust Project
 
 See [`templates/README.md`](./templates/README.md) for full details:
