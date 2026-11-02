@@ -282,4 +282,3 @@
     packages.keyhints = keyhintsScript;
   };
 }
-
