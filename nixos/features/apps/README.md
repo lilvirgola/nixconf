@@ -15,6 +15,7 @@ Complete multi-language developer stack, container engines, and documentation co
 - **Go**: `go`, `gopls`, `golangci-lint`, `delve`.
 - **Rust**: `rustup` managing `rustc`, `cargo`, `rust-analyzer`, `clippy`, and `rustfmt`.
 - **C/C++**: `gcc`, `clang`, `gnumake`, `cmake`, `pkg-config`, `ninja`.
+- **Protobuf & gRPC APIs**: `buf` (Protobuf code generation, linter, and schema registry CLI), `protobuf`, `grpcurl`, `websocat`, `act`.
 
 ### LaTeX & Academic Publishing
 - **TeX Live Suite**: `texliveMedium` bundled with `biber` (bibliography) and `chktex` (linter).
@@ -78,7 +79,7 @@ Comprehensive Cyber Security, Binary Exploitation (Pwn), Reverse Engineering, Cr
 Essential daily productivity, graphics, media, and document applications:
 - **Web & Communication**: Firefox, Vesktop (Discord Wayland client with screensharing and rich presence), Telegram Desktop, Obsidian.
 - **Graphics & Media**: GIMP 3, Spotify, VLC, MPV, Pavucontrol (audio control).
-- **File Management**: Thunar with archive and volume plugins, `gvfs` (trash and auto-mounting), `tumbler` (thumbnails), `programs.dconf` (GTK dark themes), Yazi terminal file manager.
+- **File Management & Theming**: Thunar with archive and volume plugins, `gvfs` (trash and auto-mounting), `tumbler` (thumbnails), Yazi terminal file manager, and system-wide GTK3/GTK4 theming (`adw-gtk3-dark`, `Papirus-Dark`, `Bibata-Modern-Classic` cursors, and dconf `prefer-dark` settings configured via `nixos/settings.nix`).
 - **PDFs & Screenshots**: Zathura with SyncTeX, `poppler-utils`, `grim`, `slurp`, and `swappy` (`SUPER + SHIFT + S`).
 
 ---

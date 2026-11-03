@@ -58,12 +58,15 @@
       inspectrum
       sigdigger
 
-      # Game Development & Automation
-      godot_4
-      act
+      # API, gRPC, Protobuf & Automation
+      protobuf
+      buf
       grpcurl
       websocat
-      protobuf
+      act
+      
+      # Game Development
+      godot_4
 
       # LaTeX & LuaTeX toolchain
       (texliveMedium.withPackages (ps: [

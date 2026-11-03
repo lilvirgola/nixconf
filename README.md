@@ -132,7 +132,7 @@ All personal identity and regional preferences are centralized in [`nixos/settin
 
 ```nix
 options.custom = {
-  username = "virgola";         # Changes login name across all modules, sudoers, and configs
+  username = "virgola";           # Changes login name across all modules, sudoers, and configs
   userDescription = "Alessandro"; # Full GECOS name
   initialPassword = "nixos";      # Default initial password for new systems
   timezone = "Europe/Rome";       # System timezone
@@ -140,14 +140,23 @@ options.custom = {
   extraLocale = "it_IT.UTF-8";    # Currency, time, and numeric formatting
   keyboardLayout = "it";          # Wayland & X11 keyboard layout
   consoleKeyMap = "it2";          # Linux console TTY keymap
+
+  theme = {
+    colorScheme = "dark";         # Global dark mode preference (XDG portal & dconf)
+    gtkTheme = "adw-gtk3-dark";   # GTK 3/4 theme for Thunar, Pavucontrol, GIMP
+    iconTheme = "Papirus-Dark";   # Modern dark icon theme
+    cursorTheme = "Bibata-Modern-Classic"; # Global cursor theme
+    cursorSize = 24;              # Cursor size in pixels
+  };
 };
 ```
 
-When you update `username`, all related configurations dynamically adapt:
-- User creation and group assignments (`wheel`, `networkmanager`, `docker`, `wireshark`, `video`, etc.)
-- Default interactive login shell (`zsh`)
-- Ollama passwordless daemon control rules in `sudoers`
-- Password reset logic in `bootstrap.sh` and VM runner
+When you update these settings:
+- User creation and group assignments (`wheel`, `networkmanager`, `docker`, `wireshark`, `video`, etc.) adapt dynamically.
+- Default interactive login shell (`zsh`) follows the configured user.
+- Ollama passwordless daemon control rules in `sudoers` point to your user.
+- Password prompts in `bootstrap.sh` and VM runner query your username.
+- **GTK Applications & Desktop Plumbing**: GTK 3 & GTK 4 (`/etc/xdg/gtk-*/settings.ini`), dconf user databases (`org/gnome/desktop/interface`), and environment variables (`GTK_THEME`, `XCURSOR_THEME`, `XCURSOR_SIZE`) automatically sync, ensuring Thunar, Pavucontrol, GIMP, and file pickers seamlessly open in dark mode without bright light-theme flashes.
 
 ---
 
@@ -179,6 +188,7 @@ ninit latex my-thesis        # LaTeX / LuaTeX with Tectonic, SyncTeX, Texlab
 - **PHP**: PHP 8.4 CLI with Composer.
 - **Cyber Security & CTF**: Python with `pwntools`, `pycryptodome`, `ropper`, `gdb`, `checksec`, `patchelf`.
 - **Java**: OpenJDK 21 LTS (`jdk21`).
+- **Protobuf & APIs**: `buf` CLI (`.proto` code generation, linting, and breaking change detection), `protobuf` compiler, `grpcurl`, `websocat`, and local GitHub Actions runner `act`.
 - **LaTeX / Academic**: `tectonic` standalone compiler, `texliveMedium` (with `biber` & `chktex`), `texlab` LSP, `ltex-ls-plus`, and **Zathura SyncTeX** (Ctrl+Click in PDF navigates directly to LaTeX source code line).
 - **Containers**: Docker daemon (`virtualisation.docker.enable = true`), `docker-compose`, and `distrobox`.
 - **IDEs**: Visual Studio Code (`vscode`) and Antigravity AI IDE (`antigravity-ide`) with CLI agent (`agy`).

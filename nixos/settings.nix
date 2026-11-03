@@ -52,6 +52,38 @@
         default = "it2";
         description = "Linux console TTY keymap.";
       };
+
+      theme = {
+        colorScheme = lib.mkOption {
+          type = lib.types.enum ["dark" "light" "default"];
+          default = "dark";
+          description = "Global color scheme preference for XDG desktop portals, Qt, and GTK applications.";
+        };
+
+        gtkTheme = lib.mkOption {
+          type = lib.types.str;
+          default = "adw-gtk3-dark";
+          description = "GTK 3/4 application theme name.";
+        };
+
+        iconTheme = lib.mkOption {
+          type = lib.types.str;
+          default = "Papirus-Dark";
+          description = "System-wide icon theme.";
+        };
+
+        cursorTheme = lib.mkOption {
+          type = lib.types.str;
+          default = "Bibata-Modern-Classic";
+          description = "System-wide cursor theme.";
+        };
+
+        cursorSize = lib.mkOption {
+          type = lib.types.int;
+          default = 24;
+          description = "Default cursor size.";
+        };
+      };
     };
   };
 }
