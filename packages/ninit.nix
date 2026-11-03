@@ -89,7 +89,31 @@
           exit 1
         fi
 
-        if [ -n "$TARGET_DIR" ]; then
+        if [ -z "$TARGET_DIR" ] && [ -t 0 ]; then
+          CURRENT_DIR="$(pwd)"
+          echo ""
+          echo "Select target directory:"
+          echo "  1) Current folder ($CURRENT_DIR)"
+          echo "  2) Create a new folder"
+          read -rp "Enter choice [1/2] (default: 1) or folder name: " dir_choice
+          case "$dir_choice" in
+            ""|1)
+              TARGET_DIR="."
+              ;;
+            2)
+              read -rp "Enter new folder name: " new_dir
+              while [ -z "$new_dir" ]; do
+                read -rp "Folder name cannot be empty. Enter folder name: " new_dir
+              done
+              TARGET_DIR="$new_dir"
+              ;;
+            *)
+              TARGET_DIR="$dir_choice"
+              ;;
+          esac
+        fi
+
+        if [ -n "$TARGET_DIR" ] && [ "$TARGET_DIR" != "." ]; then
           mkdir -p "$TARGET_DIR"
           cd "$TARGET_DIR"
         fi
@@ -101,6 +125,19 @@
         if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
           git init -q
           echo "[+] Initialized empty Git repository."
+        fi
+
+        # Ensure .direnv/ is ignored so it is not tracked by Git
+        if [ ! -f .gitignore ]; then
+          printf ".direnv/\nresult\nresult-*\n" > .gitignore
+        elif ! grep -q "^\.direnv" .gitignore; then
+          printf "\n# Direnv\n.direnv/\n" >> .gitignore
+        fi
+
+        # Nix flakes require flake.nix to be tracked in Git for evaluation
+        if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+          git add -A
+          echo "[+] Staged template files in Git."
         fi
 
         if command -v direnv >/dev/null 2>&1 && [ -f .envrc ]; then
