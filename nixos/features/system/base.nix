@@ -97,7 +97,7 @@
     # Define a user account with an initial default password ("nixos")
     users.users."virgola" = {
       isNormalUser = true;
-      initialPassword = "nixos";
+      initialPassword = lib.mkDefault "nixos";
       description = "Alessandro";
       extraGroups = [
         "networkmanager"

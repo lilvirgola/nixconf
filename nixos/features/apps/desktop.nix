@@ -39,7 +39,7 @@
       obsidian
 
       # Productivity & Office
-      libreoffice-still
+      libreoffice
       qalculate-gtk
       qbittorrent
 

@@ -3,7 +3,11 @@
   inputs,
   ...
 }: {
-  flake.nixosModules.vmConfiguration = {pkgs, ...}: {
+  flake.nixosModules.vmConfiguration = {
+    pkgs,
+    lib,
+    ...
+  }: {
     imports = [
       self.nixosModules.vmHardware
       self.nixosModules.base
@@ -29,6 +33,7 @@
     networking.hostName = "nixos";
 
     # Ensure password works in the VM even if nixos.qcow2 already exists
+    users.users."virgola".initialPassword = lib.mkForce null;
     users.users."virgola".password = "nixos";
     users.users."root".password = "nixos";
 

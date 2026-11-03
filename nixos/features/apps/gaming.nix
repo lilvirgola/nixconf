@@ -16,6 +16,13 @@
 
     programs.gamemode.enable = true;
 
+    nixpkgs.config.permittedInsecurePackages = [
+      "sidequest-1.4.1"
+    ];
+    nixpkgs.config.problems.handlers = {
+      "gtk+".broken = "warn";
+    };
+
     environment.systemPackages = with pkgs; [
       heroic
       lutris
@@ -26,7 +33,7 @@
       mangohud
       protontricks
       winetricks
-      wineWowPackages.waylandFull
+      wineWow64Packages.waylandFull
     ];
   };
 }

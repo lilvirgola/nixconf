@@ -8,14 +8,14 @@
     services.tailscale.enable = true;
     services.mullvad-vpn = {
       enable = true;
-      package = pkgs.mullvad-vpn;
+      gui.enable = true;
     };
 
     # 2. Local AI / Ollama with CUDA acceleration
     # Down on boot by default (0 VRAM idle) — start on-demand with `ollama-up`
     services.ollama = {
       enable = true;
-      acceleration = "cuda";
+      package = pkgs.ollama-cuda;
       host = "127.0.0.1";
       port = 11434;
     };
@@ -49,21 +49,11 @@
         package = pkgs.qemu_kvm;
         runAsRoot = true;
         swtpm.enable = true;
-        ovmf = {
-          enable = true;
-          packages = [
-            (pkgs.OVMF.override {
-              secureBoot = true;
-              tpmSupport = true;
-            })
-            .fd
-          ];
-        };
       };
     };
     programs.virt-manager.enable = true;
 
-    # 4. Printing (Brother HL-1210W via brlaser driver & CUPS)
+    # 4. Printing (brlaser driver & CUPS)
     services.printing = {
       enable = true;
       drivers = [pkgs.brlaser];
@@ -82,4 +72,3 @@
     ];
   };
 }
-

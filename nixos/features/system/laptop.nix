@@ -6,8 +6,12 @@
     # MediaTek MT7921 Bluetooth firmware reset after suspend/resume
     systemd.services.mt7921-bt-resume = {
       description = "Fix MT7921 Bluetooth after resume";
-      after = ["suspend.target" "hibernate.target" "hybrid-sleep.target"];
-      wantedBy = ["suspend.target" "hibernate.target" "hybrid-sleep.target"];
+      after = [
+        "systemd-suspend.service"
+        "systemd-hibernate.service"
+        "systemd-hybrid-sleep.service"
+      ];
+      wantedBy = ["sleep.target"];
       serviceConfig = {
         Type = "oneshot";
         ExecStartPre = "${pkgs.kmod}/bin/modprobe -r btusb";
@@ -27,10 +31,8 @@
     services.fprintd.enable = true;
 
     # Logitech Bolt / Unifying wireless receiver daemon & GUI (Solaar)
-    hardware.logitech.wireless = {
-      enable = true;
-      enableGraphical = true;
-    };
+    hardware.logitech.wireless.enable = true;
+    programs.solaar.enable = true;
 
     # Filesystem drivers: Btrfs and NTFS (for external drives)
     boot.supportedFilesystems = ["btrfs" "ntfs"];
@@ -46,7 +48,6 @@
     environment.systemPackages = with pkgs; [
       brightnessctl
       acpi
-      solaar
     ];
   };
 }

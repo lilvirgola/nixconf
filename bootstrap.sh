@@ -147,9 +147,26 @@ if [ "$GEN_HARDWARE" = true ]; then
   read -r gen_choice
   if [[ ! "$gen_choice" =~ ^[Nn]$ ]]; then
     if command -v nixos-generate-config >/dev/null 2>&1; then
-      info "Running 'nixos-generate-config --show-hardware-config'..."
+      ROOT_OPT=""
+      if [ -d "/mnt" ] && mountpoint -q /mnt 2>/dev/null; then
+        ROOT_OPT="--root /mnt"
+        info "Target filesystem detected at /mnt, using 'nixos-generate-config --root /mnt'..."
+      fi
+
+      info "Running 'nixos-generate-config $ROOT_OPT --show-hardware-config'..."
       TMP_HW=$(mktemp)
-      sudo nixos-generate-config --show-hardware-config > "$TMP_HW"
+      sudo nixos-generate-config $ROOT_OPT --show-hardware-config > "$TMP_HW" 2>/dev/null || true
+
+      # Fallback: if show-hardware-config output is empty, check pre-generated hardware-configuration.nix
+      if [ ! -s "$TMP_HW" ]; then
+        if [ -n "$ROOT_OPT" ] && [ -s "/mnt/etc/nixos/hardware-configuration.nix" ]; then
+          info "Reading pre-generated /mnt/etc/nixos/hardware-configuration.nix..."
+          cat /mnt/etc/nixos/hardware-configuration.nix > "$TMP_HW"
+        elif [ -s "/etc/nixos/hardware-configuration.nix" ]; then
+          info "Reading pre-generated /etc/nixos/hardware-configuration.nix..."
+          cat /etc/nixos/hardware-configuration.nix > "$TMP_HW"
+        fi
+      fi
 
       if [ -s "$TMP_HW" ]; then
         if [ -f "$HOST_DIR/hardware.nix" ]; then
