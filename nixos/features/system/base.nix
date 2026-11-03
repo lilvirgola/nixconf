@@ -1,10 +1,12 @@
 {self, ...}: {
   flake.nixosModules.base = {
+    config,
     pkgs,
     lib,
     ...
   }: {
     imports = [
+      self.nixosModules.settings
       self.nixosModules.zsh
     ];
 
@@ -60,32 +62,32 @@
     # Enable networking
     networking.networkmanager.enable = true;
 
-    # Set your time zone.
-    time.timeZone = "Europe/Rome";
+    # Set system time zone from centralized settings
+    time.timeZone = config.custom.timezone;
 
-    # Select internationalisation properties.
-    i18n.defaultLocale = "en_US.UTF-8";
+    # Select internationalisation properties
+    i18n.defaultLocale = config.custom.locale;
 
     i18n.extraLocaleSettings = {
-      LC_ADDRESS = "it_IT.UTF-8";
-      LC_IDENTIFICATION = "it_IT.UTF-8";
-      LC_MEASUREMENT = "it_IT.UTF-8";
-      LC_MONETARY = "it_IT.UTF-8";
-      LC_NAME = "it_IT.UTF-8";
-      LC_NUMERIC = "it_IT.UTF-8";
-      LC_PAPER = "it_IT.UTF-8";
-      LC_TELEPHONE = "it_IT.UTF-8";
-      LC_TIME = "it_IT.UTF-8";
+      LC_ADDRESS = config.custom.extraLocale;
+      LC_IDENTIFICATION = config.custom.extraLocale;
+      LC_MEASUREMENT = config.custom.extraLocale;
+      LC_MONETARY = config.custom.extraLocale;
+      LC_NAME = config.custom.extraLocale;
+      LC_NUMERIC = config.custom.extraLocale;
+      LC_PAPER = config.custom.extraLocale;
+      LC_TELEPHONE = config.custom.extraLocale;
+      LC_TIME = config.custom.extraLocale;
     };
 
     # Configure keymap in X11 / Wayland
     services.xserver.xkb = {
-      layout = "it";
+      layout = config.custom.keyboardLayout;
       variant = "";
     };
 
     # Configure console keymap
-    console.keyMap = "it2";
+    console.keyMap = config.custom.consoleKeyMap;
 
     # Audio with PipeWire
     services.pipewire = {
@@ -94,11 +96,11 @@
       pulse.enable = true;
     };
 
-    # Define a user account with an initial default password ("nixos")
-    users.users."virgola" = {
+    # Define primary user account from centralized settings
+    users.users.${config.custom.username} = {
       isNormalUser = true;
-      initialPassword = lib.mkDefault "nixos";
-      description = "Alessandro";
+      initialPassword = lib.mkDefault config.custom.initialPassword;
+      description = config.custom.userDescription;
       extraGroups = [
         "networkmanager"
         "wheel"

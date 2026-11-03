@@ -207,16 +207,24 @@ fi
 # 4. User Password Configuration
 if [ "$SET_PASSWORD" = true ]; then
   echo ""
-  ask "Would you like to set/update the password for user 'virgola'? (y/N): "
+  TARGET_USER="virgola"
+  if command -v nix >/dev/null 2>&1; then
+    RESOLVED_USER=$(nix eval --raw "$REPO_DIR#nixosConfigurations.$TARGET_HOST.config.custom.username" 2>/dev/null || true)
+    if [ -n "$RESOLVED_USER" ]; then
+      TARGET_USER="$RESOLVED_USER"
+    fi
+  fi
+
+  ask "Would you like to set/update the password for user '$TARGET_USER'? (y/N): "
   read -r pwd_choice
   if [[ "$pwd_choice" =~ ^[Yy]$ ]]; then
-    if id "virgola" &>/dev/null; then
-      info "Updating password for existing user 'virgola'..."
-      sudo passwd virgola
-      success "Password updated for 'virgola'!"
+    if id "$TARGET_USER" &>/dev/null; then
+      info "Updating password for existing user '$TARGET_USER'..."
+      sudo passwd "$TARGET_USER"
+      success "Password updated for '$TARGET_USER'!"
     else
-      info "User 'virgola' will be created during the system rebuild."
-      info "You can set your password immediately after the first boot/switch with: ${BOLD}sudo passwd virgola${NC}"
+      info "User '$TARGET_USER' will be created during the system rebuild."
+      info "You can set your password immediately after the first boot/switch with: ${BOLD}sudo passwd $TARGET_USER${NC}"
     fi
   fi
 fi

@@ -1,5 +1,6 @@
 {
   flake.nixosModules.zsh = {
+    config,
     pkgs,
     lib,
     ...
@@ -25,7 +26,7 @@
   in {
     # Set default user shell to Zsh
     users.defaultUserShell = pkgs.zsh;
-    users.users."virgola".shell = pkgs.zsh;
+    users.users.${config.custom.username}.shell = pkgs.zsh;
 
     # Packages required by aliases, prompt and Bitwarden integration
     environment.systemPackages = with pkgs; [

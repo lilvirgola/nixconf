@@ -13,16 +13,24 @@ Any package defined here is:
 ### 1. `ninit` ([`packages/ninit.nix`](./ninit.nix))
 An interactive, automated project scaffolding CLI tool:
 - Scans `templates/` and prompts with an interactive `fzf` picker.
-- Scaffolds complete projects for:
-  - `python-uv`: Modern Python 3 with `uv`, `pyproject.toml`, and `.envrc`.
+- Scaffolds complete projects for 9 distinct ecosystems:
+  - `python-uv` (`py`, `uv`): Modern Python with `uv`, `ruff`, `pyright`, and `nix-ld` library bindings.
+  - `typescript` (`ts`, `node`): Node.js 22 LTS with `pnpm`, `typescript`, `biome`, and starter code.
+  - `c-cpp` (`c`, `cpp`): C++20 project with Clang, CMake, Ninja, GDB, and clang-tools.
+  - `embedded` (`pio`, `arm`): Embedded microcontroller project with PlatformIO, ARM GCC, and TinyGo.
+  - `php`: PHP 8.4 CLI with Composer and starter server.
+  - `pwn` (`ctf`, `exploit`): CTF and binary exploitation harness with Pwntools, Ropper, Pycryptodome, and GDB.
   - `go`: Go module with `gopls`, `golangci-lint`, and `.envrc`.
-  - `rust`: Rust crate with `Cargo.toml`, `rust-toolchain.toml`, and `.envrc`.
-  - `latex`: Complete LaTeX / LuaTeX document setup with Tectonic, Texlab, Zathura SyncTeX, and `.envrc`.
+  - `rust` (`rs`): Rust crate with `Cargo.toml`, `rust-toolchain.toml`, and `.envrc`.
+  - `latex` (`tex`): Complete LaTeX / LuaTeX document setup with Tectonic, Texlab, Zathura SyncTeX, and `.envrc`.
 - Automatically initializes git repositories and runs `direnv allow`.
 - **Usage**:
   ```bash
   ninit                  # Interactive selection with fzf
   ninit rust my-crate    # Direct initialization
+  ninit ts my-app        # TypeScript & Node 22 initialization
+  ninit cpp my-sim       # C/C++ CMake initialization
+  ninit pwn my-exploit   # Binary exploitation harness
   ```
 
 ---

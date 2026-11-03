@@ -4,6 +4,7 @@
   ...
 }: {
   flake.nixosModules.vmConfiguration = {
+    config,
     pkgs,
     lib,
     ...
@@ -33,8 +34,10 @@
     networking.hostName = "nixos";
 
     # Ensure password works in the VM even if nixos.qcow2 already exists
-    users.users."virgola".initialPassword = lib.mkForce null;
-    users.users."virgola".password = "nixos";
+    users.users.${config.custom.username} = {
+      initialPassword = lib.mkForce null;
+      password = "nixos";
+    };
     users.users."root".password = "nixos";
 
     # VM runner configuration (applied when running ./result/bin/run-nixos-vm)

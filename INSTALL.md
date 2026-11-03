@@ -148,6 +148,13 @@ git clone https://github.com/lilvirgola/nixconf.git /mnt/etc/nixos
 cd /mnt/etc/nixos
 ```
 
+> [!TIP]
+> **Customizing User & Regional Settings**:
+> If you want to use your own username, full name, timezone, or keyboard layout instead of the defaults, simply edit [`nixos/settings.nix`](./nixos/settings.nix) now:
+> ```bash
+> nano nixos/settings.nix # Update custom.username, custom.timezone, etc.
+> ```
+
 ### Step 5.2: Generate Hardware Profile
 Run `nixos-generate-config` targeting the mounted root:
 ```bash
@@ -160,7 +167,7 @@ Execute `bootstrap.sh` targeting the `laptop` host. The script will:
 2. Stage all configuration files in Git.
 3. Validate flake evaluation and syntax.
 4. Execute `nixos-install --flake .#laptop`.
-5. Prompt you to set your user password for `virgola`.
+5. Dynamically detect your configured user from `nixos/settings.nix` and prompt you to set your password.
 
 ```bash
 ./bootstrap.sh --host laptop
@@ -171,8 +178,8 @@ Execute `bootstrap.sh` targeting the `laptop` host. The script will:
 # Install system directly using the flake:
 nixos-install --flake .#laptop --root /mnt
 
-# Set password for virgola
-nixos-enter --root /mnt -c "passwd virgola"
+# Set password for your user (e.g. virgola or custom username)
+nixos-enter --root /mnt -c "passwd $(nix eval --raw .#nixosConfigurations.laptop.config.custom.username)"
 ```
 
 ---

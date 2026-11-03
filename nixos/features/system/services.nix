@@ -1,5 +1,6 @@
 {
   flake.nixosModules.services = {
+    config,
     pkgs,
     lib,
     ...
@@ -21,10 +22,10 @@
     };
     systemd.services.ollama.wantedBy = lib.mkForce [];
 
-    # Allow virgola to start/stop ollama without password prompt
+    # Allow primary user to start/stop ollama without password prompt
     security.sudo.extraRules = [
       {
-        users = ["virgola"];
+        users = [config.custom.username];
         commands = [
           {
             command = "${pkgs.systemd}/bin/systemctl start ollama";

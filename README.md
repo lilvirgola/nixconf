@@ -42,10 +42,11 @@ nixconf/
 ├── lib/                       # Flake infrastructure: supported systems, Alejandra formatter, checks
 ├── wrappedPrograms/           # Standalone wrapped applications (MangoWM, Noctalia, Niri)
 ├── packages/                  # Custom flake packages (ninit, keyhints, mtp, tunnelmole)
-├── templates/                 # Project templates (python-uv, go, rust, latex)
+├── templates/                 # 9 Project templates (Python, TypeScript, C/C++, Embedded, PHP, Pwn, Go, Rust, LaTeX)
 ├── nixos/
+│   ├── settings.nix           # Centralized single source of truth for user & regional settings
 │   ├── features/              # Composable NixOS capability modules
-│   │   ├── system/            # Base OS, desktop sessions, VPNs, power, audio, Nvidia
+│   │   ├── system/            # Base OS, desktop sessions, VPNs, power, audio, Nvidia, Ollama
 │   │   └── apps/              # Daily desktop, developer stacks, security suite, gaming
 │   └── hosts/                 # Machine assemblies
 │       ├── laptop/            # Physical Laptop with UEFI, Nvidia, Blueman, SSH disabled (#laptop)
@@ -125,24 +126,58 @@ The configuration provides a complete offensive, defensive, and cryptanalysis la
 
 ---
 
+## 👤 Centralized User & Regional Identity (`nixos/settings.nix`)
+
+All personal identity and regional preferences are centralized in [`nixos/settings.nix`](./nixos/settings.nix). If you are forking this repository or customizing it for another user, you only need to change settings in **this single file**:
+
+```nix
+options.custom = {
+  username = "virgola";         # Changes login name across all modules, sudoers, and configs
+  userDescription = "Alessandro"; # Full GECOS name
+  initialPassword = "nixos";      # Default initial password for new systems
+  timezone = "Europe/Rome";       # System timezone
+  locale = "en_US.UTF-8";         # Primary locale
+  extraLocale = "it_IT.UTF-8";    # Currency, time, and numeric formatting
+  keyboardLayout = "it";          # Wayland & X11 keyboard layout
+  consoleKeyMap = "it2";          # Linux console TTY keymap
+};
+```
+
+When you update `username`, all related configurations dynamically adapt:
+- User creation and group assignments (`wheel`, `networkmanager`, `docker`, `wireshark`, `video`, etc.)
+- Default interactive login shell (`zsh`)
+- Ollama passwordless daemon control rules in `sudoers`
+- Password reset logic in `bootstrap.sh` and VM runner
+
+---
+
 ## 🚀 Developer Toolchains & Templates (`ninit`)
 
 Scaffold new reproducible development environments with a single command:
 
 ```bash
-# Launch interactive template picker:
+# Launch interactive template picker (fzf):
 ninit
 
-# Or scaffold directly:
+# Or scaffold directly by name or alias:
 ninit rust my-crate          # Rust with Cargo, rust-analyzer, clippy
-ninit py my-fastapi          # Python 3.14 with uv, ruff, pyright
+ninit py my-fastapi          # Python with uv, ruff, pyright
+ninit ts my-app              # TypeScript & Node 22 with pnpm and Biome
+ninit cpp my-engine          # Modern C++20 with Clang, CMake, Ninja, GDB
+ninit pio my-firmware        # Embedded microcontroller with PlatformIO, ARM GCC, TinyGo
+ninit php my-api             # Modern PHP 8.4 with Composer
+ninit pwn my-exploit         # CTF / binary exploitation harness with Pwntools, Ropper, GDB
 ninit go my-service          # Go with gopls, golangci-lint, delve
 ninit latex my-thesis        # LaTeX / LuaTeX with Tectonic, SyncTeX, Texlab
 ```
 
 ### Supported Stacks & Languages
 - **Python**: `uv` package manager with `UV_PYTHON_DOWNLOADS=automatic`, `python3Packages.pip`, `ruff`, `pyright`. Prebuilt C/C++ wheels run natively via `nix-ld`.
-- **PHP**: PHP 8.5 with standard extensions.
+- **TypeScript & Node.js**: Node.js 22 LTS, `pnpm`, `typescript`, `@biomejs/biome`, and `tsx`.
+- **C / C++**: Clang, GCC, CMake, Ninja, GDB, Valgrind, and `clang-tools` (clangd, clang-format).
+- **Embedded & Hardware**: PlatformIO Core (`pio`), `gcc-arm-embedded`, `tinygo`, `avrdude`, and `openocd`.
+- **PHP**: PHP 8.4 CLI with Composer.
+- **Cyber Security & CTF**: Python with `pwntools`, `pycryptodome`, `ropper`, `gdb`, `checksec`, `patchelf`.
 - **Java**: OpenJDK 21 LTS (`jdk21`).
 - **LaTeX / Academic**: `tectonic` standalone compiler, `texliveMedium` (with `biber` & `chktex`), `texlab` LSP, `ltex-ls-plus`, and **Zathura SyncTeX** (Ctrl+Click in PDF navigates directly to LaTeX source code line).
 - **Containers**: Docker daemon (`virtualisation.docker.enable = true`), `docker-compose`, and `distrobox`.

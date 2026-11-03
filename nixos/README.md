@@ -8,7 +8,8 @@ Everything specific to **NixOS** lives under this directory, structured accordin
 
 ```text
 nixos/
-├── features/                  # Composable, reusable NixOS modules
+├── settings.nix           # Centralized single source of truth for user & regional settings
+├── features/              # Composable, reusable NixOS modules
 │   ├── system/                # OS plumbing, desktop sessions, shells, networking, power
 │   │   ├── base.nix           # Core system, user virgola, nix-ld, fonts, GC & deduplication
 │   │   ├── mangowm.nix        # MangoWM Wayland compositor session & autostart
@@ -48,10 +49,10 @@ Each directory under `hosts/<hostname>/` defines a concrete system exposed via `
 
 ---
 
-## 2. Core System Defaults (`base.nix`)
+## 2. Core System Defaults (`settings.nix` & `base.nix`)
 
-All hosts import `self.nixosModules.base`, which guarantees a consistent, modern foundation across all machines:
-- **Primary User**: `virgola` (Alessandro), member of `wheel`, `networkmanager`, `docker`, `wireshark`, `video`, `audio`.
+All hosts import `self.nixosModules.base`, which sources centralized user and regional settings from `nixos/settings.nix`:
+- **Primary User**: Configured via `config.custom.username` (defaults to `virgola` / Alessandro), member of `wheel`, `networkmanager`, `docker`, `wireshark`, `video`, `audio`.
 - **Storage Hygiene**:
   - Weekly automated garbage collection (`nix.gc` with `--delete-older-than 7d`).
   - Weekly store deduplication (`nix.optimise`) and live store deduplication (`auto-optimise-store = true`).
