@@ -7,6 +7,7 @@
       self.nixosModules.wireguard
       self.nixosModules.laptopFeatures
       self.nixosModules.nvidia
+      self.nixosModules.services
       self.nixosModules.desktopApps
       self.nixosModules.dev
       self.nixosModules.security

@@ -2,6 +2,11 @@
   flake.nixosModules.dev = {pkgs, ...}: {
     virtualisation.docker.enable = true;
 
+    # PlatformIO microcontroller udev rules (ESP32, STM32, Arduino)
+    services.udev.packages = with pkgs; [
+      platformio-core.udev
+    ];
+
     environment.sessionVariables = {
       UV_PYTHON_DOWNLOADS = "automatic";
     };
@@ -14,7 +19,10 @@
       ruff
       pyright
 
-      # PHP & Web development
+      # Node.js, Web & TypeScript
+      nodejs_22
+      pnpm
+      typescript
       php
 
       # Java JDK (LTS 21)
@@ -39,6 +47,23 @@
       cmake
       pkg-config
       ninja
+
+      # Embedded Hardware & Microcontrollers
+      gcc-arm-embedded
+      platformio
+      tinygo
+
+      # Software Defined Radio (SDR) & Signal Analysis
+      gnuradio
+      inspectrum
+      sigdigger
+
+      # Game Development & Automation
+      godot_4
+      act
+      grpcurl
+      websocat
+      protobuf
 
       # LaTeX & LuaTeX toolchain
       (texliveMedium.withPackages (ps: [

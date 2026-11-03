@@ -26,6 +26,7 @@
       # Decompilers, Disassemblers & Hex Editors
       ghidra
       ghidraAuto
+      jadx
       rizin
       radare2
       imhex
@@ -44,6 +45,7 @@
       checksec
       patchelf
       elfutils
+      bpftrace
       ht
       ltrace
       strace
@@ -53,10 +55,12 @@
       # Steganography, File Analysis & Password Cracking
       binwalk
       stegsolve
+      zsteg
       john
 
       # Network, Packet & Traffic Analysis
       tshark
+      termshark
       python3Packages.pyshark
       nmap
       netcat-gnu

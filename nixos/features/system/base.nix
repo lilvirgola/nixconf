@@ -106,6 +106,11 @@
         "audio"
         "docker"
         "wireshark"
+        "libvirtd"
+        "kvm"
+        "input"
+        "dialout"
+        "uucp"
       ];
       packages = with pkgs; [];
     };
@@ -116,6 +121,7 @@
     # Base packages and CLI power tools installed across all hosts
     environment.systemPackages = with pkgs; [
       vim
+      neovim
       wget
       curl
       git
@@ -134,6 +140,8 @@
       jq
       playerctl
       brightnessctl
+      gparted
+      scrcpy
       self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
       self.packages.${pkgs.stdenv.hostPlatform.system}.keyhints
     ];

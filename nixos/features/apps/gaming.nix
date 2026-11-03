@@ -18,8 +18,15 @@
 
     environment.systemPackages = with pkgs; [
       heroic
+      lutris
+      chiaki-ng
+      prismlauncher
+      sidequest
+      dualsensectl
       mangohud
       protontricks
+      winetricks
+      wineWowPackages.waylandFull
     ];
   };
 }

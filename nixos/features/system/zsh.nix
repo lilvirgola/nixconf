@@ -71,6 +71,9 @@
         keyhints = "keyhints";
         keys = "keyhints";
         openfortivpn = "sudo openfortivpn";
+        ollama-up = "sudo systemctl start ollama && echo '✓ Ollama CUDA daemon online (http://localhost:11434)'";
+        ollama-down = "sudo systemctl stop ollama && echo '✓ Ollama daemon stopped (VRAM released)'";
+        ollama-stat = "systemctl status ollama";
         ssh-vault-save = "ssh-vault-add";
         ssh-vault-push = "ssh-vault-add";
         ssh-vault-ls = "ssh-vault-list";

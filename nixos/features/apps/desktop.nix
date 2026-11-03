@@ -21,19 +21,31 @@
     '';
 
     environment.systemPackages = with pkgs; [
+      # Web Browsers
+      brave
+
       # Music & Media
       spotify
       mpv
       vlc
       pavucontrol
+      picard
+      obs-studio
+      yt-dlp
 
       # Communication & Notes
       vesktop
       telegram-desktop
       obsidian
 
+      # Productivity & Office
+      libreoffice-still
+      qalculate-gtk
+      qbittorrent
+
       # Files, PDFs, Graphics & Screenshots
       gimp
+      inkscape
       yazi
       zathura
       poppler-utils
