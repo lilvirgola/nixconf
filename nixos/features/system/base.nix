@@ -35,6 +35,7 @@
     # GNOME Keyring & Secret Service for storing credentials in VS Code, Git, and browsers
     services.gnome.gnome-keyring.enable = true;
     services.gnome.gcr-ssh-agent.enable = false;
+    programs.seahorse.enable = true;
     security.pam.services.sddm.enableGnomeKeyring = true;
     security.pam.services.login.enableGnomeKeyring = true;
 
@@ -139,6 +140,7 @@
       p7zip
       rbw
       bitwarden-cli
+      libsecret
       jq
       playerctl
       brightnessctl
@@ -169,6 +171,7 @@
       openssl
       curl
       glib
+      libsecret
       libGL
       libxkbcommon
       libxml2

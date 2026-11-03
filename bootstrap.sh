@@ -90,6 +90,37 @@ done
 
 banner
 
+# 0. Ensure Git is installed (especially on NixOS Minimal ISO)
+if ! command -v git >/dev/null 2>&1; then
+  info "Git is required for cloning and flake evaluation, but not found in PATH."
+  info "Attempting to install Git..."
+
+  if command -v nix-env >/dev/null 2>&1; then
+    nix-env -iA nixos.git 2>/dev/null || nix-env -iA nixpkgs.git 2>/dev/null || true
+  elif command -v nix >/dev/null 2>&1; then
+    nix profile install nixpkgs#git --extra-experimental-features "nix-command flakes" 2>/dev/null || true
+  elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update -qq && sudo apt-get install -y -qq git 2>/dev/null || true
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Sy --noconfirm git 2>/dev/null || true
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y git 2>/dev/null || true
+  fi
+
+  export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+
+  if ! command -v git >/dev/null 2>&1; then
+    if command -v nix-shell >/dev/null 2>&1 && [ -f "$0" ]; then
+      info "Entering temporary nix-shell with Git to continue bootstrap..."
+      exec nix-shell -p git --run "bash \"$0\" \"$@\""
+    else
+      error "Git could not be installed automatically. Please install Git (e.g. 'nix-shell -p git') and re-run."
+      exit 1
+    fi
+  fi
+  success "Git is installed and ready."
+fi
+
 # 1. Locate repository directory
 if [ -z "$REPO_DIR" ]; then
   if [ -f "./flake.nix" ] && [ -d "./nixos" ]; then
@@ -98,8 +129,14 @@ if [ -z "$REPO_DIR" ]; then
     REPO_DIR="$HOME/nixconf"
   elif [ -d "/etc/nixos" ] && [ -f "/etc/nixos/flake.nix" ]; then
     REPO_DIR="/etc/nixos"
+  elif [ -d "/mnt/etc/nixos" ] && [ -f "/mnt/etc/nixos/flake.nix" ]; then
+    REPO_DIR="/mnt/etc/nixos"
   else
-    REPO_DIR="$HOME/nixconf"
+    if [ -d "/mnt" ] && mountpoint -q /mnt 2>/dev/null; then
+      REPO_DIR="/mnt/etc/nixos"
+    else
+      REPO_DIR="$HOME/nixconf"
+    fi
     info "Repository not found locally. Cloning to $REPO_DIR..."
     git clone https://github.com/lilvirgola/nixconf.git "$REPO_DIR"
   fi
@@ -191,6 +228,12 @@ if [ "$GEN_HARDWARE" = true ]; then
         # Ensure proper permissions
         sudo chown -R "$(id -u):$(id -g)" "$HOST_DIR/hardware.nix" 2>/dev/null || true
         chmod 644 "$HOST_DIR/hardware.nix"
+
+        # Tell Git to ignore local modifications to hardware.nix without breaking Nix flake tracking
+        if [ -d "$REPO_DIR/.git" ]; then
+          git update-index --skip-worktree "$HOST_DIR/hardware.nix" 2>/dev/null || true
+        fi
+
         success "Hardware configuration updated and wrapped successfully!"
       else
         warn "nixos-generate-config produced empty output. Keeping existing hardware.nix."

@@ -142,9 +142,12 @@ lsblk -f "$DISK"
 ## 5. Cloning nixconf & Automated Bootstrapping
 
 ### Step 5.1: Clone the Repository into Target Root
+> [!NOTE]
+> If using the **NixOS Minimal ISO**, Git is not installed by default. You can run Git via `nix-shell -p git` as shown below, or run `bootstrap.sh` which automatically installs Git if missing.
+
 ```bash
 mkdir -p /mnt/etc/nixos
-git clone https://github.com/lilvirgola/nixconf.git /mnt/etc/nixos
+nix-shell -p git --run "git clone https://github.com/lilvirgola/nixconf.git /mnt/etc/nixos"
 cd /mnt/etc/nixos
 ```
 
