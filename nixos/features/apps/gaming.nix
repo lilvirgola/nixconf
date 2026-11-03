@@ -20,7 +20,7 @@
       "sidequest-1.4.1"
     ];
     nixpkgs.config.problems.handlers = {
-      "gtk+".broken = "warn";
+      "gtk+".broken = "ignore";
     };
 
     environment.systemPackages = with pkgs; [

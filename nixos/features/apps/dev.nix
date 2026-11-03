@@ -74,8 +74,14 @@
     environment.systemPackages = with pkgs; [
       # Python & uv
       uv
-      python3
-      python3Packages.pip
+      (python3.withPackages (ps:
+        with ps; [
+          pip
+          dbus-python
+          pygobject3
+          cryptography
+          pyopenssl
+        ]))
       ruff
       pyright
 
