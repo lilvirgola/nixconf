@@ -64,7 +64,7 @@
       grpcurl
       websocat
       act
-      
+
       # Game Development
       godot_4
 
