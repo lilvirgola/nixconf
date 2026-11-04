@@ -13,7 +13,8 @@
         nativeBuildInputs = [pkgs.makeBinaryWrapper];
         postBuild = ''
           wrapProgram $out/bin/noctalia \
-            --set-default NOCTALIA_CONFIG_HOME "${configDir}"
+            --set-default NOCTALIA_CONFIG_HOME "${configDir}" \
+            --unset MANGO_INSTANCE_SIGNATURE
         '';
       })
       .overrideAttrs (old: {

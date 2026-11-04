@@ -120,7 +120,11 @@
                       local exit_code=$?
                       if [[ $exit_code -eq 0 && -n "$session" ]]; then
                         export BW_SESSION="$session"
-                        echo "[✓] Vault unlocked and BW_SESSION exported into current shell."
+                        if [[ " $* " =~ " --raw " ]]; then
+                          echo "$session"
+                        else
+                          echo "[✓] Vault unlocked and BW_SESSION exported into current shell." >&2
+                        fi
                       else
                         return $exit_code
                       fi
@@ -138,7 +142,11 @@
                       local exit_code=$?
                       if [[ $exit_code -eq 0 && -n "$session" ]]; then
                         export BW_SESSION="$session"
-                        echo "[✓] Logged in and BW_SESSION exported into current shell."
+                        if [[ " $* " =~ " --raw " ]]; then
+                          echo "$session"
+                        else
+                          echo "[✓] Logged in and BW_SESSION exported into current shell." >&2
+                        fi
                       else
                         return $exit_code
                       fi
@@ -372,20 +380,20 @@
                   # Try official bw CLI first
                   if command -v bw >/dev/null 2>&1; then
                     local bw_status
-                    bw_status="$(bw status 2>/dev/null | jq -r '.status // empty' 2>/dev/null || true)"
+                    bw_status="$(command bw status 2>/dev/null | jq -r '.status // empty' 2>/dev/null || true)"
 
                     if [[ "$bw_status" == "unauthenticated" ]]; then
                       echo "[*] Bitwarden CLI is not logged in."
                       echo "    Tip: If using Vaultwarden, run: bw config server <YOUR_VAULT_URL>"
                       echo "    Logging in to Bitwarden..."
                       bw login || true
-                      bw_status="$(bw status 2>/dev/null | jq -r '.status // empty' 2>/dev/null || true)"
+                      bw_status="$(command bw status 2>/dev/null | jq -r '.status // empty' 2>/dev/null || true)"
                     fi
 
                     if [[ "$bw_status" == "locked" ]]; then
                       echo "[*] Vault is locked. Enter master password to unlock:"
                       local session
-                      session="$(bw unlock --raw)" || true
+                      session="$(command bw unlock --raw)" || true
                       if [[ -n "$session" ]]; then
                         export BW_SESSION="$session"
                         bw_status="unlocked"
@@ -395,7 +403,7 @@
                     if [[ "$bw_status" == "unlocked" ]]; then
                       echo "[*] Preparing item '$key_name' for Bitwarden vault..."
                       local existing_id
-                      existing_id="$(bw list items --search "$key_name" 2>/dev/null | jq -r --arg n "$key_name" '.[] | select(.name==$n) | .id' 2>/dev/null | head -n1 || true)"
+                      existing_id="$(command bw list items --search "$key_name" ''${BW_SESSION:+--session "$BW_SESSION"} 2>/dev/null | jq -r --arg n "$key_name" '.[] | select(.name==$n) | .id' 2>/dev/null | head -n1 || true)"
 
                       if [[ -n "$existing_id" && "$existing_id" != "null" && "$force" != true ]]; then
                         echo -n "[?] Item '$key_name' already exists in vault (ID: $existing_id). Overwrite? [y/N]: "
@@ -424,14 +432,20 @@
 
                       if [[ -n "$existing_id" && "$existing_id" != "null" ]]; then
                         echo "[*] Updating existing item in vault..."
-                        echo "$item_json" | jq --arg id "$existing_id" '.id = $id' | bw encode | bw edit item "$existing_id" >/dev/null && saved=true
+                        local edit_json
+                        edit_json="$(printf '%s' "$item_json" | jq --arg id "$existing_id" '.id = $id')"
+                        local edit_encoded
+                        edit_encoded="$(printf '%s' "$edit_json" | base64 | tr -d '\r\n')"
+                        command bw edit item "$existing_id" "$edit_encoded" ''${BW_SESSION:+--session "$BW_SESSION"} >/dev/null && saved=true
                       else
                         echo "[*] Creating new item in vault..."
-                        echo "$item_json" | bw encode | bw create item >/dev/null && saved=true
+                        local encoded
+                        encoded="$(printf '%s' "$item_json" | base64 | tr -d '\r\n')"
+                        command bw create item "$encoded" ''${BW_SESSION:+--session "$BW_SESSION"} >/dev/null && saved=true
                       fi
 
                       if [[ "$saved" == true ]]; then
-                        bw sync >/dev/null 2>&1 || true
+                        command bw sync >/dev/null 2>&1 || true
                       fi
                     fi
                   fi

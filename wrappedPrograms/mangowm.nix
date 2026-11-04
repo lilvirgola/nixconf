@@ -8,8 +8,8 @@
     packages.myMango = inputs.wrapper-modules.wrappers.mangowc.wrap {
       inherit pkgs;
       autostart_sh = ''
-        # Desktop shell
-        ${lib.getExe self'.packages.myNoctalia} &
+        # Desktop shell (unsetting MANGO_INSTANCE_SIGNATURE ensures native ext-workspace-v1 is used)
+        env -u MANGO_INSTANCE_SIGNATURE ${lib.getExe self'.packages.myNoctalia} &
 
         # Polkit graphical authentication agent
         ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
