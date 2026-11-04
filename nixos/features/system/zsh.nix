@@ -78,6 +78,10 @@
         ssh-vault-save = "ssh-vault-add";
         ssh-vault-push = "ssh-vault-add";
         ssh-vault-ls = "ssh-vault-list";
+        bwu = "bw unlock";
+        bwl = "bw lock";
+        rbwu = "rbw unlock";
+        rbwl = "rbw lock";
       };
 
       ohMyZsh = {
@@ -97,8 +101,86 @@
       };
 
       interactiveShellInit = ''
-                # Clean standard PATH exports (NixOS-native)
+                # Clean standard PATH exports (NixOS-native) and GPG TTY
                 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+                export GPG_TTY=$(tty)
+
+                # Bitwarden CLI (bw) wrapper: automatically exports and unsets BW_SESSION
+                bw() {
+                  case "''${1:-}" in
+                    unlock)
+                      shift
+                      if [[ " $* " =~ " --check " || " $* " =~ " -h " || " $* " =~ " --help " ]]; then
+                        command bw unlock "$@"
+                        return $?
+                      fi
+
+                      local session
+                      session=$(command bw unlock --raw "$@")
+                      local exit_code=$?
+                      if [[ $exit_code -eq 0 && -n "$session" ]]; then
+                        export BW_SESSION="$session"
+                        echo "[✓] Vault unlocked and BW_SESSION exported into current shell."
+                      else
+                        return $exit_code
+                      fi
+                      ;;
+
+                    login)
+                      shift
+                      if [[ " $* " =~ " --check " || " $* " =~ " -h " || " $* " =~ " --help " ]]; then
+                        command bw login "$@"
+                        return $?
+                      fi
+
+                      local session
+                      session=$(command bw login --raw "$@")
+                      local exit_code=$?
+                      if [[ $exit_code -eq 0 && -n "$session" ]]; then
+                        export BW_SESSION="$session"
+                        echo "[✓] Logged in and BW_SESSION exported into current shell."
+                      else
+                        return $exit_code
+                      fi
+                      ;;
+
+                    lock)
+                      command bw lock "$@"
+                      local exit_code=$?
+                      unset BW_SESSION
+                      echo "[*] Vault locked and BW_SESSION cleared."
+                      return $exit_code
+                      ;;
+
+                    logout)
+                      command bw logout "$@"
+                      local exit_code=$?
+                      unset BW_SESSION
+                      echo "[*] Logged out and BW_SESSION cleared."
+                      return $exit_code
+                      ;;
+
+                    *)
+                      # If interactive and vault is locked, auto-unlock on data commands
+                      if [[ -t 0 && -z "''${BW_SESSION:-}" && -n "''${1:-}" && "$1" != "status" && "$1" != "config" && "$1" != "help" && "$1" != "--help" && "$1" != "-h" && "$1" != "--version" && "$1" != "-v" ]]; then
+                        local st
+                        st=$(command bw status 2>/dev/null | jq -r '.status // empty' 2>/dev/null || true)
+                        if [[ "$st" == "locked" ]]; then
+                          echo "[*] Bitwarden vault is locked. Unlocking..."
+                          local session
+                          session=$(command bw unlock --raw)
+                          if [[ -n "$session" ]]; then
+                            export BW_SESSION="$session"
+                            echo "[✓] Vault unlocked and BW_SESSION exported."
+                          else
+                            return 1
+                          fi
+                        fi
+                      fi
+                      command bw "$@"
+                      ;;
+                  esac
+                }
 
                 # Helper to load SSH keys from Bitwarden/Vaultwarden into ssh-agent in memory
                 ssh-vault-load() {

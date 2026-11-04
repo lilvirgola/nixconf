@@ -146,12 +146,21 @@
       brightnessctl
       gparted
       scrcpy
+      gnupg
+      pinentry-curses
       self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
       self.packages.${pkgs.stdenv.hostPlatform.system}.keyhints
     ];
 
     # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK
     programs.ssh.startAgent = true;
+
+    # GnuPG agent with socket activation for GPG keys and pinentry
+    programs.gnupg.agent = {
+      enable = true;
+      enableSSHSupport = false;
+      pinentryPackage = pkgs.pinentry-gnome3;
+    };
 
     # Enable direnv + nix-direnv for automatic per-project devShell loading
     programs.direnv = {
