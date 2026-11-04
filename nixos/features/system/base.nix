@@ -181,6 +181,19 @@
       util-linux
     ];
 
+    # Ensure /bin/bash exists for Makefiles and scripts
+    system.activationScripts.binbash = {
+      deps = ["binsh"];
+      text = ''
+        mkdir -p /bin
+        ln -sfn "${pkgs.bashInteractive}/bin/bash" /bin/.bash.tmp
+        mv /bin/.bash.tmp /bin/bash
+      '';
+    };
+
+    # FUSE filesystem providing dynamic /bin and /usr/bin resolution for shebangs and build systems
+    services.envfs.enable = true;
+
     system.stateVersion = "26.05";
   };
 }
