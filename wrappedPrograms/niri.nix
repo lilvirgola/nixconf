@@ -19,7 +19,7 @@
         layout.gaps = 5;
 
         binds = {
-          "Mod+Return".spawn-sh = lib.getExe pkgs.kitty;
+          "Mod+Return".spawn-sh = lib.getExe self'.packages.myKitty;
           "Mod+Q".close-window = [];
           "Mod+S".spawn-sh = "${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher";
           "Mod+H".spawn-sh = lib.getExe self'.packages.keyhints;

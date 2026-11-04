@@ -58,6 +58,10 @@ Optional scrollable-tiling Wayland compositor:
 - Fallback compositor paired with `myNoctalia` and `keyhints`.
 - Infinite horizontal scrollable tiling strip layout.
 
+### 4. `myKitty` ([`wrappedPrograms/kitty.nix`](./kitty.nix))
+The wrapped Kitty terminal emulator:
+- Disables the exit confirmation prompt (`confirm_os_window_close = 0`) when closing windows via `SUPER + Q`.
+
 ---
 
 ## How to Author a Wrapped Program

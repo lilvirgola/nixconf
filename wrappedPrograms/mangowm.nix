@@ -80,7 +80,7 @@
           # App Launchers & Default Applications
           "SUPER,d,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher"
           "SUPER,s,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle launcher"
-          "SUPER,Return,spawn,${lib.getExe pkgs.kitty}"
+          "SUPER,Return,spawn,${lib.getExe self'.packages.myKitty}"
           "SUPER,b,spawn,${lib.getExe pkgs.firefox}"
           "SUPER,e,spawn,${lib.getExe pkgs.thunar}"
           "SUPER+ALT,v,spawn,${lib.getExe self'.packages.myNoctalia} msg panel-toggle clipboard"

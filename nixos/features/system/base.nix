@@ -129,7 +129,7 @@
       curl
       git
       gh
-      kitty
+      self.packages.${pkgs.stdenv.hostPlatform.system}.myKitty
       alacritty
       btop
       fastfetch
