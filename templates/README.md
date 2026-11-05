@@ -1,4 +1,4 @@
-# `templates/` — Project DevShell Templates (`Python`, `Go`, `Rust`, `LaTeX`, `TypeScript`, `C/C++`, `Embedded`, `PHP`, `Pwn`)
+# `templates/` — Project DevShell Templates
 
 This directory houses reproducible, zero-friction project templates exposed via `flake.templates.<name>` and consumable with the automated `ninit` CLI tool or `nix flake init -t`.
 
@@ -16,14 +16,28 @@ ninit
 
 # 2. Or specify template and project name directly:
 ninit rust my-crate          # Scaffolds Rust template in ./my-crate
+ninit rust-gui my-gpui-app   # Scaffolds Rust GUI (GPUI, Bevy, Egui) in ./my-gpui-app
+ninit zig my-zig-app         # Scaffolds Zig & ZLS template in ./my-zig-app
+ninit typst my-doc           # Scaffolds Typst & Tinymist template in ./my-doc
 ninit py my-fastapi          # Scaffolds Python uv template in ./my-fastapi
 ninit go my-microservice     # Scaffolds Go template in ./my-microservice
-ninit latex my-thesis        # Scaffolds LaTeX/LuaTeX template in ./my-thesis
+ninit bun my-bun-app         # Scaffolds Bun JS/TS template in ./my-bun-app
 ninit ts my-frontend         # Scaffolds TypeScript & Node 22 template in ./my-frontend
+ninit latex my-thesis        # Scaffolds LaTeX/LuaTeX template in ./my-thesis
 ninit cpp my-engine          # Scaffolds Modern C/C++ template in ./my-engine
 ninit pio my-firmware        # Scaffolds Embedded & PlatformIO template in ./my-firmware
-ninit php my-api             # Scaffolds PHP 8.4 & Composer template in ./my-api
-ninit pwn my-ctf             # Scaffolds Binary Exploitation template in ./my-ctf
+ninit php my-api             # Scaffolds PHP & Composer template in ./my-api
+ninit shell my-script        # Scaffolds Shellcheck & shfmt template in ./my-script
+ninit java my-java-app       # Scaffolds Java & Gradle/Maven template in ./my-java-app
+ninit cs my-dotnet-app       # Scaffolds C# & .NET 9 template in ./my-dotnet-app
+ninit elixir my-elixir-app   # Scaffolds Elixir & Erlang template in ./my-elixir-app
+ninit haskell my-haskell     # Scaffolds Haskell & HLS template in ./my-haskell
+ninit nix my-flake           # Scaffolds Nix packaging & LSP template in ./my-flake
+ninit pwn my-pwn-ctf         # Scaffolds Binary Exploitation template in ./my-pwn-ctf
+ninit rev my-reversing-lab   # Scaffolds Reverse Engineering template in ./my-reversing-lab
+ninit ctf-web my-web-ctf     # Scaffolds CTF Web Exploitation template in ./my-web-ctf
+ninit crypto my-crypto-ctf   # Scaffolds CTF Cryptography template in ./my-crypto-ctf
+ninit net my-pcap-lab        # Scaffolds CTF Network / PCAP template in ./my-pcap-lab
 ```
 
 `ninit` handles all boilerplate automatically:
@@ -34,131 +48,37 @@ ninit pwn my-ctf             # Scaffolds Binary Exploitation template in ./my-ct
 
 ---
 
-### Method 2: Instant Global Toolchains (Zero Nix Files Needed)
+## Available Templates (23 Total)
 
-Because `uv`, `python3`, `go`, `rustup`, `gcc`, `nodejs_22`, `pnpm`, `php`, `tectonic`, and `nix-ld` are installed globally in `dev.nix`, you can also create projects anywhere just like on traditional Linux:
+### Systems & General Purpose
+1. **`rust`**: Cargo, rustc, rust-analyzer, clippy, rustfmt, OpenSSL, starter `Cargo.toml` and `src/main.rs`.
+2. **`rust-gui`**: Rust GUI/Game dev (GPUI, Bevy, Egui, Winit) preconfigured with Wayland, Vulkan, libxkbcommon, Fontconfig, and `LD_LIBRARY_PATH`.
+3. **`zig`**: Zig compiler, `zls` language server, GDB, starter `build.zig` and `src/main.zig`.
+4. **`c-cpp`**: Clang, GCC, CMake, Ninja, GDB, Valgrind, `clang-tools` (clangd, clang-format).
+5. **`go`**: Go, `gopls` language server, `golangci-lint`, `delve` debugger, starter `go.mod` and `main.go`.
+6. **`python-uv`**: Python, `uv`, `ruff`, `pyright`, `nix-ld` compatibility, starter `pyproject.toml` and `main.py`.
+7. **`embedded`**: PlatformIO Core (`pio`), ARM Embedded GCC, TinyGo, Avrdude, OpenOCD.
 
-#### Python (`uv`)
-```bash
-mkdir my-py && cd my-py
-uv init
-uv add requests fastapi
-uv run main.py
-```
+### Web, Scripting & Runtimes
+8. **`typescript`**: Node.js 22 LTS, `pnpm`, `typescript`, `biome` linter/formatter, `package.json`, `tsconfig.json`.
+9. **`bun`**: Bun ultra-fast runtime, package manager, test runner, starter `package.json` and `index.ts`.
+10. **`php`**: PHP CLI, Composer, PSR-4 autoloading starter `composer.json` and `public/index.php`.
+11. **`shell`**: Bash & POSIX shell scripting with `shellcheck` linter and `shfmt` formatter.
 
-#### TypeScript & Node.js
-```bash
-mkdir my-node && cd my-node
-pnpm init
-pnpm add -D typescript tsx @types/node
-pnpm tsx index.ts
-```
+### Document & Typesetting
+12. **`typst`**: Modern document typesetting with `typst`, `typstyle` formatter, and `tinymist` LSP.
+13. **`latex`**: TeX Live Full, LuaTeX, `tectonic`, `texlab` LSP, `zathura` viewer with bidirectional SyncTeX.
 
-#### Go
-```bash
-mkdir my-go && cd my-go
-go mod init example.com/my-go
-go run .
-```
+### Enterprise & Functional Languages
+14. **`java`**: OpenJDK 21, Gradle, Maven, preconfigured `JAVA_HOME`.
+15. **`csharp`**: .NET 9 SDK, `omnisharp-roslyn`, preconfigured `DOTNET_ROOT` and starter `.csproj`.
+16. **`elixir`**: Elixir, Erlang/OTP, `rebar3`.
+17. **`haskell`**: GHC, Cabal, Haskell Language Server (`haskell-language-server`).
+18. **`nix`**: Nix flake development with `nixd` LSP, `statix` linter, `deadnix`, and `alejandra` formatter.
 
-#### Rust
-```bash
-# First time setup (once):
-rustup default stable
-
-cargo new my-rust && cd my-rust
-cargo run
-```
-
-#### LaTeX / Academic
-```bash
-mkdir my-doc && cd my-doc
-cat << 'EOF' > main.tex
-\documentclass{article}
-\begin{document}
-Hello from Tectonic on NixOS!
-\end{document}
-EOF
-tectonic -X compile main.tex
-```
-
----
-
-### Method 3: Standard Flake Initialization (`nix flake init -t`)
-
-For manual flake initialization:
-
-```bash
-mkdir my-project && cd my-project
-
-# Initialize from the local flake:
-nix flake init -t /home/virgola/nixconf#python-uv
-# OR
-nix flake init -t /home/virgola/nixconf#typescript
-# OR
-nix flake init -t /home/virgola/nixconf#c-cpp
-# OR
-nix flake init -t /home/virgola/nixconf#embedded
-# OR
-nix flake init -t /home/virgola/nixconf#php
-# OR
-nix flake init -t /home/virgola/nixconf#pwn
-# OR
-nix flake init -t /home/virgola/nixconf#go
-# OR
-nix flake init -t /home/virgola/nixconf#rust
-# OR
-nix flake init -t /home/virgola/nixconf#latex
-
-# Activate devShell:
-direnv allow
-```
-
----
-
-## Template Details
-
-### 1. `python-uv` ([`templates/python-uv/`](./python-uv/))
-- **Tools**: Python 3.14, `uv`, `ruff`, `pyright`.
-- **Preconfigured**: `UV_PYTHON_DOWNLOADS=automatic` and `nix-ld` dynamic library bindings so binary wheels (NumPy, PyTorch, Pandas, Scipy) install and link without C-compiler compilation errors.
-
-### 2. `typescript` ([`templates/typescript/`](./typescript/))
-- **Tools**: Node.js 22 LTS, `pnpm`, `typescript`, `biome` linter/formatter, `tsx` runner.
-- **Includes**: `package.json`, `tsconfig.json`, and starter `src/index.ts`.
-
-### 3. `c-cpp` ([`templates/c-cpp/`](./c-cpp/))
-- **Tools**: Clang, GCC, CMake, Ninja, GDB, Valgrind, `clang-tools` (clangd, clang-format), `pkg-config`.
-- **Includes**: `CMakeLists.txt` (C++20 standard) and starter `src/main.cpp`.
-
-### 4. `embedded` ([`templates/embedded/`](./embedded/))
-- **Tools**: PlatformIO Core (`pio`), ARM Embedded GCC (`gcc-arm-embedded`), TinyGo, Avrdude, OpenOCD.
-- **Includes**: `platformio.ini` (ESP32 / Arduino / FreeRTOS) and starter `src/main.c`.
-
-### 5. `php` ([`templates/php/`](./php/))
-- **Tools**: PHP 8.4 CLI, Composer.
-- **Includes**: `composer.json` (PSR-4 autoloading) and starter `public/index.php`.
-
-### 6. `pwn` ([`templates/pwn/`](./pwn/))
-- **Tools**: Python 3 with `pwntools`, `pycryptodome`, `ropper`, `gdb`, `checksec`, `patchelf`, `strace`, `ltrace`.
-- **Includes**: Modular CTF harness script `exploit.py` with GDB and remote support.
-
-### 7. `go` ([`templates/go/`](./go/))
-- **Tools**: Go 1.24+, `gopls` language server, `golangci-lint`, and `delve` debugger.
-- **Includes**: Clean `main.go`, `go.mod`, and `Makefile`.
-
-### 8. `rust` ([`templates/rust/`](./rust/))
-- **Tools**: `cargo`, `rustc`, `rust-analyzer`, `clippy`, and `rustfmt` managed with `rustup` or native toolchain.
-- **Includes**: Cargo configuration, boilerplate `src/main.rs`, and `.gitignore`.
-
-### 9. `latex` ([`templates/latex/`](./latex/))
-- **Tools**: `tectonic`, `texliveMedium` (with `biber` & `chktex`), `texlab` language server, `ltex-ls-plus`, and `zathura`.
-- **Live SyncTeX Bidirectional Sync**:
-  - Live compilation and continuous watching:
-    ```bash
-    tectonic -X watch --keep-intermediates --synctex
-    ```
-  - Open PDF with Zathura:
-    ```bash
-    zathura build/main.pdf &
-    ```
-  - Hold `Ctrl` and click any text inside Zathura to jump directly to the exact source file and line in your editor!
+### Security, CTF & Reverse Engineering (Personalized)
+19. **`pwn`**: Binary exploitation with Python `pwntools`, `pycryptodome`, `ropper`, `ropgadget`, `one_gadget`, `gdb`, `checksec`, `patchelf`, `socat`.
+20. **`reversing`**: Reverse engineering & binary analysis with `radare2`, `rizin`, `ghidra-bin`, `hexyl`, `binwalk`, `capstone`, `unicorn`, `pefile`.
+21. **`ctf-web`**: Web penetration testing & CTF with `ffuf`, `sqlmap`, `mitmproxy`, `socat`, `requests`, `httpx`, `beautifulsoup4`.
+22. **`ctf-crypto`**: Cryptanalysis & mathematical CTF with `gmpy2`, `sympy`, `z3-solver`, `pycryptodome`, `cryptography`, `hashcat`, and `john`.
+23. **`ctf-network`**: Network packet & PCAP forensics with `wireshark-cli` (`tshark`), `termshark`, `tcpdump`, `scapy`, `pyshark`, and `dpkt`.

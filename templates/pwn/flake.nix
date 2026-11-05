@@ -28,6 +28,9 @@
           elfutils
           strace
           ltrace
+          one_gadget
+          ropgadget
+          socat
         ];
 
         shellHook = ''
