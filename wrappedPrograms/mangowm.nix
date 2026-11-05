@@ -22,6 +22,9 @@
           timeout 900 '${lib.getExe self'.packages.myNoctalia} msg session lock' \
           timeout 1800 'systemctl suspend' \
           before-sleep '${lib.getExe self'.packages.myNoctalia} msg session lock' &
+
+        # Inhibit idle lock and sleep while media/game audio is playing
+        ${lib.getExe pkgs.wayland-pipewire-idle-inhibit} &
       '';
       settings = {
         # Keyboard layout matching Italian keymap

@@ -71,6 +71,14 @@
     services.tumbler.enable = true;
     services.gvfs.enable = true;
 
+    # GNOME Calendar backend storage & sync daemon
+    services.gnome.evolution-data-server.enable = true;
+
+    # Default application for calendar events and Noctalia calendar right-click
+    xdg.mime.defaultApplications = {
+      "text/calendar" = "org.gnome.Calendar.desktop";
+    };
+
     # Zathura SyncTeX configuration for live bidirectional editor sync
     environment.etc."xdg/zathura/zathurarc".text = ''
       set synctex true
@@ -101,6 +109,7 @@
       obsidian
 
       # Productivity & Office
+      gnome-calendar
       libreoffice
       qalculate-gtk
       qbittorrent
