@@ -1,7 +1,24 @@
 {self, ...}: {
-  flake.nixosModules.wireguard = {pkgs, ...}: {
+  flake.nixosModules.wireguard = {
+    config,
+    pkgs,
+    ...
+  }: {
     # Loose reverse path filtering is required so VPN client tunnels (WireGuard, Fortinet) don't drop packets
     networking.firewall.checkReversePath = "loose";
+
+    # Passwordless sudo rule for openfortivpn client
+    security.sudo.extraRules = [
+      {
+        users = [config.custom.username];
+        commands = [
+          {
+            command = "${pkgs.openfortivpn}/bin/openfortivpn";
+            options = ["NOPASSWD"];
+          }
+        ];
+      }
+    ];
 
     # Enable NetworkManager OpenConnect plugin (supports Fortinet SSL VPN protocol natively)
     networking.networkmanager.plugins = with pkgs; [

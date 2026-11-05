@@ -105,6 +105,14 @@
                 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
                 export GPG_TTY=$(tty)
 
+                # Ensure SSH_AUTH_SOCK is always exported in interactive shells & IDE terminals
+                if [[ -z "$SSH_AUTH_SOCK" ]]; then
+                  local user_runtime="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+                  if [[ -S "$user_runtime/ssh-agent" ]]; then
+                    export SSH_AUTH_SOCK="$user_runtime/ssh-agent"
+                  fi
+                fi
+
                 # Bitwarden CLI (bw) wrapper: automatically exports and unsets BW_SESSION
                 bw() {
                   case "''${1:-}" in

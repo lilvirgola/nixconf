@@ -26,7 +26,17 @@ Complete multi-language developer stack, container engines, and documentation co
 - **Docker Engine**: `virtualisation.docker.enable = true` + `docker-compose`. User `virgola` has non-root Docker access.
 - **Distrobox**: Launch arbitrary Linux distributions (Ubuntu, Fedora, Arch) inside your terminal.
 - **Visual Studio Code**: `pkgs.vscode` with extensions and remote support.
-- **Antigravity AI Platform**: FHS-wrapped `antigravity-ide` and CLI agent `agy`.
+- **Antigravity AI Platform**: Native host-integrated `antigravity-ide` (with `sudo` support, Wayland flags, and optional FHS mode) and CLI agent `agy` / `antigravity-cli`.
+
+---
+
+## 2. `antigravity.nix` (`flake.nixosModules.antigravity`)
+
+Dedicated modular packaging and NixOS configuration for Google's Antigravity AI platform:
+- **Native Host Execution (Default)**: Runs `antigravity-ide` directly on the host using `nix-ld` and `envfs`. Avoids Bubblewrap `PR_SET_NO_NEW_PRIVS` restrictions, allowing `sudo` commands and SUID binaries to execute seamlessly in the integrated terminal.
+- **Toggleable FHS Sandbox**: `programs.antigravity.useFHS = true` is available if full Bubblewrap filesystem virtualization is desired.
+- **CLI Dual Executables**: Packages both `agy` and `antigravity-cli` executables, plus an `antigravity` symlink for Zathura SyncTeX and terminal workflows.
+- **Flake Packages**: Exposes `.packages.antigravity-ide`, `.packages.antigravity-cli`, and `.packages.agy` under `perSystem.packages`.
 
 ---
 

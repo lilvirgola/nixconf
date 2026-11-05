@@ -152,8 +152,25 @@
       self.packages.${pkgs.stdenv.hostPlatform.system}.keyhints
     ];
 
-    # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK
-    programs.ssh.startAgent = true;
+    # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK and automatic agent forwarding
+    programs.ssh = {
+      startAgent = true;
+      extraConfig = ''
+        Host *
+          ForwardAgent yes
+          AddKeysToAgent yes
+      '';
+    };
+
+    # Ensure systemd user session and all GUI applications (including Antigravity IDE)
+    # inherit SSH_AUTH_SOCK pointing to the running ssh-agent socket.
+    systemd.user.settings.Manager = {
+      DefaultEnvironment = "SSH_AUTH_SOCK=%t/ssh-agent";
+    };
+
+    systemd.user.services.ssh-agent = {
+      postStart = "${pkgs.systemd}/bin/systemctl --user set-environment SSH_AUTH_SOCK=%t/ssh-agent";
+    };
 
     # GnuPG agent with socket activation for GPG keys and pinentry
     programs.gnupg.agent = {
