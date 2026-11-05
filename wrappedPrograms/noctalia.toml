@@ -30,6 +30,7 @@ type = "workspaces"
 labels_only_when_occupied = false
 hide_when_empty = false
 show_labels = true
+show_icons = true
 label_source = "id"
 
 [widget.launcher]
