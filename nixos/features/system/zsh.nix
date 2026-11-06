@@ -28,10 +28,25 @@
     users.defaultUserShell = pkgs.zsh;
     users.users.${config.custom.username}.shell = pkgs.zsh;
 
-    # Packages required by aliases, prompt and Bitwarden integration
+    # Pre-populate ~/.zshrc for new users so zsh-newuser-install never triggers
+    environment.etc."skel/.zshrc".text = ''
+      # User Zsh configuration
+      # System-wide settings, Oh My Zsh, prompt, and plugins are declaratively managed in:
+      # /etc/zshrc (nixos/features/system/zsh.nix)
+    '';
+
+    # Guarantee ~/.zshrc exists for the primary user on boot/install if missing
+    systemd.tmpfiles.rules = [
+      "f /home/${config.custom.username}/.zshrc 0644 ${config.custom.username} users - # User Zsh configuration\n# Declaratively managed in nixconf (nixos/features/system/zsh.nix)\n"
+    ];
+
+    # Packages required by aliases, prompt, completions, and Bitwarden integration
     environment.systemPackages = with pkgs; [
       lsd
       lolcat
+      zsh-completions
+      zsh-fzf-tab
+      zoxide
     ];
 
     # Powerline / Nerd fonts required for agnosterzak glyphs
@@ -94,6 +109,16 @@
           "docker"
           "docker-compose"
           "gh"
+          "sudo"
+          "extract"
+          "colored-man-pages"
+          "copypath"
+          "copyfile"
+          "systemd"
+          "python"
+          "rust"
+          "golang"
+          "zoxide"
         ];
         customPkgs = [
           agnosterzak
@@ -565,6 +590,17 @@
                 if command -v fzf >/dev/null 2>&1; then
                   source <(fzf --zsh)
                 fi
+
+                # FZF-Tab: interactive fuzzy tab completion
+                source ${pkgs.zsh-fzf-tab}/share/fzf-tab/fzf-tab.plugin.zsh
+
+                # FZF-Tab previews & behaviors
+                zstyle ':fzf-tab:complete:cd:*' fzf-preview 'lsd -1 --color=always $realpath'
+                zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+                zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ''${(P)word}'
+                zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview 'ps -fp $word'
+                zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags '--preview-window=down:3:wrap'
+                zstyle ':fzf-tab:*' continuous-trigger '/'
 
                 # Non-blocking background open function with xdg-open
                 unalias open 2>/dev/null
