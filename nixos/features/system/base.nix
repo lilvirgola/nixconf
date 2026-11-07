@@ -150,6 +150,7 @@
       pinentry-curses
       self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
       self.packages.${pkgs.stdenv.hostPlatform.system}.keyhints
+      self.packages.${pkgs.stdenv.hostPlatform.system}.kssh
     ];
 
     # Start SSH Agent as a systemd user service with $SSH_AUTH_SOCK and automatic agent forwarding

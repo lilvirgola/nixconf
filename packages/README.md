@@ -70,6 +70,25 @@ Open-source `ngrok` alternative:
 
 ---
 
+### 5. `kssh` ([`packages/kssh.nix`](./kssh.nix))
+Interactive Kitty SSH Kitten Profile Manager & TUI Launcher:
+- Powered by Python with `rich` and `questionary` for an interactive, Catppuccin-styled terminal UI.
+- Intercepts SSH host targets, automatically recognizes first-time connections, and prompts with an interactive template picker with arrow key / vim (j/k) navigation.
+- Remembers host profiles modularly using `include templates/<name>.conf` in `~/.config/kitty/ssh_hosts.conf`.
+- Zero overhead on known hosts: directly replaces the process image via `os.execvp("kitten", ...)`.
+- **Usage**:
+  ```bash
+  s cluster                   # Connects to 'cluster' (prompts on first connection)
+  kssh myvps                  # Direct CLI invocation
+  s --list                    # Formatted Rich table of configured SSH hosts
+  s --templates               # Formatted Rich table of available connection templates
+  s --edit                    # Edit ~/.config/kitty/ssh_hosts.conf in $EDITOR
+  s --edit-template server    # Edit specific template in $EDITOR
+  s --remove cluster          # Remove saved profile to re-trigger onboarding
+  ```
+
+---
+
 ## How to Add a Custom Package
 
 Due to the Dendritic Flake-Parts architecture, simply creating a `.nix` file in `packages/` automatically registers it under `packages.<name>`.

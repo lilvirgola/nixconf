@@ -35,9 +35,14 @@
       # /etc/zshrc (nixos/features/system/zsh.nix)
     '';
 
-    # Guarantee ~/.zshrc exists for the primary user on boot/install if missing
+    # Guarantee ~/.zshrc and Kitty SSH deployment configs exist for the primary user
     systemd.tmpfiles.rules = [
       "f /home/${config.custom.username}/.zshrc 0644 ${config.custom.username} users - # User Zsh configuration\n# Declaratively managed in nixconf (nixos/features/system/zsh.nix)\n"
+      "d /home/${config.custom.username}/.config/kitty 0755 ${config.custom.username} users - -"
+      "C+ /home/${config.custom.username}/.config/kitty/ssh.conf 0644 ${config.custom.username} users - ${../../../assets/kitty/ssh.conf}"
+      "C+ /home/${config.custom.username}/.config/kitty/remote_aliases.sh 0644 ${config.custom.username} users - ${../../../assets/kitty/remote_aliases.sh}"
+      "f /home/${config.custom.username}/.config/kitty/ssh_hosts.conf 0644 ${config.custom.username} users - # Dynamic SSH endpoint configurations (managed interactively by 's <host>')\n"
+      "C+ /home/${config.custom.username}/.config/kitty/templates 0755 ${config.custom.username} users - ${../../../assets/kitty/templates}"
     ];
 
     # Packages required by aliases, prompt, completions, and Bitwarden integration
@@ -609,11 +614,22 @@
                   done
                 }
 
-                # Kitty SSH wrapper function with full SSH host completion
+                # Kitty SSH TUI wrapper ('s') powered by custom kssh package (packages/kssh.nix)
                 s() {
-                  kitten ssh "$@"
+                  kssh "$@"
                 }
                 compdef _ssh s=ssh
+                compdef _ssh kssh=ssh
+
+                # Wrapper for kitten to route 'kitten ssh' through s()
+                kitten() {
+                  if [[ "$1" == "ssh" ]]; then
+                    shift
+                    s "$@"
+                  else
+                    builtin command kitten "$@"
+                  fi
+                }
 
                 # Completion for 'kitten ssh' subcommands
                 _kitten() {
@@ -634,7 +650,7 @@
                   _hosts "$@"
                 }
 
-                # Dynamically register hosts from ~/.ssh/config & ~/.ssh/known_hosts for completion
+                # Dynamically register hosts from ~/.ssh/config, ~/.ssh/known_hosts & ssh_hosts.conf
                 _setup_ssh_hosts() {
                   local -a _all_hosts
                   if [[ -r "$HOME/.ssh/config" ]]; then
@@ -643,6 +659,9 @@
                   if [[ -r "$HOME/.ssh/known_hosts" ]]; then
                     _all_hosts+=(''\${(f)"$(grep -v '^[|#]' "$HOME/.ssh/known_hosts" 2>/dev/null | cut -d' ' -f1 | tr ',' '\n' | sed -e 's/\[//g' -e 's/\].*//g' | sort -u)"})
                   fi
+                  if [[ -r "$HOME/.config/kitty/ssh_hosts.conf" ]]; then
+                    _all_hosts+=(''\${(s: :)$(sed -ne 's/^[[:space:]]*hostname[[:space:]]\+//p' "$HOME/.config/kitty/ssh_hosts.conf" 2>/dev/null | tr '\n' ' ' | sed -e 's/[*?][^ ]*//g')})
+                  fi
                   if (( ''${#_all_hosts} )); then
                     zstyle ':completion:*:hosts' hosts ''${(u)_all_hosts}
                   fi
@@ -650,8 +669,8 @@
                 }
                 _setup_ssh_hosts
 
-                # FZF-Tab preview for SSH hosts from ~/.ssh/config
-                zstyle ':fzf-tab:complete:(s|ssh|kitten):*' fzf-preview 'grep -A 8 -i -w "Host $word" ~/.ssh/config 2>/dev/null || true'
+                # FZF-Tab preview for SSH hosts from ~/.ssh/config and ~/.config/kitty/ssh_hosts.conf
+                zstyle ':fzf-tab:complete:(s|ssh|kitten):*' fzf-preview 'grep -A 8 -i -w "Host $word" ~/.ssh/config 2>/dev/null || grep -B 1 -A 5 -w "$word" ~/.config/kitty/ssh_hosts.conf 2>/dev/null || true'
       '';
     };
   };
