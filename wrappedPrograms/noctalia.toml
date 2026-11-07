@@ -3,6 +3,9 @@ mode = "dark"
 source = "builtin"
 builtin = "Noctalia"
 
+[plugins]
+enabled = [ "andrewdems/vpn-manager" ]
+
 [bar]
 order = [ "default" ]
 
@@ -23,7 +26,7 @@ order = [ "default" ]
     background_opacity = 0.93
     start = [ "launcher", "active_window" ]
     center = [ "workspaces" ]
-    end = [ "media", "tray", "volume", "network", "bluetooth", "clock", "control-center", "session" ]
+    end = [ "media", "tray", "volume", "andrewdems/vpn-manager:bar", "network", "bluetooth", "clock", "control-center", "session" ]
 
 [widget.workspaces]
 type = "workspaces"
@@ -51,6 +54,8 @@ type = "volume"
 
 [widget.network]
 type = "network"
+vpn_status = "both"
+show_vpn_label = true
 
 [widget.bluetooth]
 type = "bluetooth"

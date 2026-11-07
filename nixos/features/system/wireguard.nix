@@ -21,8 +21,10 @@
     ];
 
     # Enable NetworkManager OpenConnect plugin (supports Fortinet SSL VPN protocol natively)
+    # and OpenVPN plugin
     networking.networkmanager.plugins = with pkgs; [
       networkmanager-openconnect
+      networkmanager-openvpn
     ];
 
     # Example configuration file for openfortivpn
@@ -44,6 +46,7 @@
       networkmanagerapplet
       openfortivpn
       openconnect
+      zenity
     ];
   };
 

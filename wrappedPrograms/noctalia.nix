@@ -13,7 +13,8 @@
         nativeBuildInputs = [pkgs.makeBinaryWrapper];
         postBuild = ''
           wrapProgram $out/bin/noctalia \
-            --set-default NOCTALIA_CONFIG_HOME "${configDir}"
+            --set-default NOCTALIA_CONFIG_HOME "${configDir}" \
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [zenity networkmanager networkmanagerapplet])}
         '';
       })
       .overrideAttrs (old: {

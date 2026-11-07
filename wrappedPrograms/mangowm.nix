@@ -15,6 +15,9 @@
         # Polkit graphical authentication agent
         ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
 
+        # NetworkManager secret agent and tray indicator
+        ${pkgs.networkmanagerapplet}/bin/nm-applet --indicator &
+
         # Clipboard persistence (keeps copied items after closing window)
         ${lib.getExe pkgs.wl-clip-persist} --clipboard both &
 
