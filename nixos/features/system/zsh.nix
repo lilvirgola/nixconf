@@ -79,7 +79,6 @@
         pip = "pip3";
         ghidra-auto = "ghidra-auto";
         pwninit = "pwninit-ghidra";
-        s = "kitten ssh";
         antigravity = "antigravity-ide";
         agy = "agy";
         ninit = "ninit";
@@ -609,6 +608,50 @@
                     xdg-open "$f" >/dev/null 2>&1 &
                   done
                 }
+
+                # Kitty SSH wrapper function with full SSH host completion
+                s() {
+                  kitten ssh "$@"
+                }
+                compdef _ssh s=ssh
+
+                # Completion for 'kitten ssh' subcommands
+                _kitten() {
+                  local curcontext="$curcontext"
+                  if (( CURRENT == 2 )); then
+                    _values 'kitten subcommand' 'ssh[Connect to SSH host using kitten]'
+                  elif [[ "''${words[2]}" == "ssh" ]]; then
+                    local service=ssh
+                    words=("ssh" "''${(@)words[3,-1]}")
+                    CURRENT=$(( CURRENT - 1 ))
+                    _ssh "$@"
+                  fi
+                }
+                compdef _kitten kitten
+
+                # Ensure SSH host completion delegates to standard _hosts resolver
+                _ssh_hosts() {
+                  _hosts "$@"
+                }
+
+                # Dynamically register hosts from ~/.ssh/config & ~/.ssh/known_hosts for completion
+                _setup_ssh_hosts() {
+                  local -a _all_hosts
+                  if [[ -r "$HOME/.ssh/config" ]]; then
+                    _all_hosts+=(''\${(s: :)$(sed -ne 's/^[Hh][Oo][Ss][Tt][[:space:]]\+//p' "$HOME/.ssh/config" 2>/dev/null | tr '\n' ' ' | sed -e 's/[*?][^ ]*//g')})
+                  fi
+                  if [[ -r "$HOME/.ssh/known_hosts" ]]; then
+                    _all_hosts+=(''\${(f)"$(grep -v '^[|#]' "$HOME/.ssh/known_hosts" 2>/dev/null | cut -d' ' -f1 | tr ',' '\n' | sed -e 's/\[//g' -e 's/\].*//g' | sort -u)"})
+                  fi
+                  if (( ''${#_all_hosts} )); then
+                    zstyle ':completion:*:hosts' hosts ''${(u)_all_hosts}
+                  fi
+                  zstyle ':completion:*:*:(s|ssh|kitten):*' tag-order 'hosts' 'users'
+                }
+                _setup_ssh_hosts
+
+                # FZF-Tab preview for SSH hosts from ~/.ssh/config
+                zstyle ':fzf-tab:complete:(s|ssh|kitten):*' fzf-preview 'grep -A 8 -i -w "Host $word" ~/.ssh/config 2>/dev/null || true'
       '';
     };
   };
