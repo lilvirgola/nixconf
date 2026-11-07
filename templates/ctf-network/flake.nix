@@ -15,7 +15,7 @@
       default = pkgs.mkShell {
         packages = with pkgs; [
           # Packet analysis & Capturing
-          wireshark-cli  # tshark
+          wireshark-cli # tshark
           termshark
           tcpdump
           nmap
@@ -39,4 +39,3 @@
     });
   };
 }
-

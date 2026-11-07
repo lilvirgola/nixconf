@@ -378,9 +378,8 @@
 
       if __name__ == "__main__":
           main()
-      '';
+    '';
   in {
     packages.kssh = ksshScript;
   };
 }
-

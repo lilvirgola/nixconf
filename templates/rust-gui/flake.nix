@@ -27,15 +27,17 @@
       ];
     in {
       default = pkgs.mkShell {
-        packages = with pkgs; [
-          cargo
-          rustc
-          rust-analyzer
-          clippy
-          rustfmt
-          pkg-config
-          openssl
-        ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux linuxLibs;
+        packages = with pkgs;
+          [
+            cargo
+            rustc
+            rust-analyzer
+            clippy
+            rustfmt
+            pkg-config
+            openssl
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux linuxLibs;
 
         env = {
           RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
@@ -49,4 +51,3 @@
     });
   };
 }
-

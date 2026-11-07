@@ -34,9 +34,11 @@
     };
 
     antigravityIde = baseIde.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + ''
-        ln -sf antigravity-ide $out/bin/antigravity
-      '';
+      postInstall =
+        (old.postInstall or "")
+        + ''
+          ln -sf antigravity-ide $out/bin/antigravity
+        '';
     });
 
     antigravityCli = pkgs.antigravity-cli.overrideAttrs (old: let
@@ -60,12 +62,16 @@
     in {
       inherit version;
       src = sourceData.${pkgs.stdenvNoCC.hostPlatform.system};
-      passthru = (old.passthru or {}) // {
-        inherit wholeVersion;
-      };
-      postInstall = (old.postInstall or "") + ''
-        ln -sf agy $out/bin/antigravity-cli
-      '';
+      passthru =
+        (old.passthru or {})
+        // {
+          inherit wholeVersion;
+        };
+      postInstall =
+        (old.postInstall or "")
+        + ''
+          ln -sf agy $out/bin/antigravity-cli
+        '';
     });
   in {
     ide = antigravityIde;
@@ -156,4 +162,3 @@ in {
     };
   };
 }
-
