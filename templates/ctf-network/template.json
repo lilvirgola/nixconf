@@ -1,0 +1,12 @@
+{
+  "name": "ctf-network",
+  "aliases": [
+    "net",
+    "network",
+    "pcap",
+    "traffic"
+  ],
+  "description": "CTF network and PCAP analysis with tshark, termshark, tcpdump, scapy, and pyshark",
+  "category": "Security & CTF",
+  "run": "python3 analyze_pcap.py <file.pcap>"
+}

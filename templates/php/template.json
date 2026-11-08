@@ -1,0 +1,7 @@
+{
+  "name": "php",
+  "aliases": [],
+  "description": "PHP project with PHP CLI and Composer",
+  "category": "Web & Runtimes",
+  "run": "composer install && php -S localhost:8000 -t public"
+}

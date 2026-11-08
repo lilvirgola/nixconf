@@ -1,84 +1,74 @@
-# `nixos/` — NixOS Configurations & Modular Architecture
+# NixOS configuration structure in nixos/
 
-Everything specific to **NixOS** lives under this directory, structured according to a clean separation of concerns between reusable feature definitions and concrete machine assemblies.
+Configurations specific to NixOS live in this directory, separated into reusable feature modules and host assemblies.
 
----
-
-## Architecture Overview
+## Directory layout
 
 ```text
 nixos/
-├── settings.nix           # Centralized single source of truth for user & regional settings
-├── features/              # Composable, reusable NixOS modules
-│   ├── system/                # OS plumbing, desktop sessions, shells, networking, power
-│   │   ├── base.nix           # Core system, user virgola, nix-ld, fonts, GC & deduplication
-│   │   ├── mangowm.nix        # MangoWM Wayland compositor session & autostart
-│   │   ├── noctalia.nix       # Noctalia v5 shell & desktop environment
-│   │   ├── niri.nix           # Niri scrollable tiling compositor fallback
-│   │   ├── wireguard.nix      # WireGuard & Fortinet SSL VPN suite (openfortivpn)
-│   │   ├── laptop.nix         # UPower, power-profiles-daemon, lid switch, Blueman
-│   │   ├── nvidia.nix         # Proprietary Nvidia drivers & PRIME offload
-│   │   └── zsh.nix            # Zsh interactive shell, Starship, power aliases & vault scripts
-│   └── apps/                  # Application suites & developer workflows
-│       ├── dev.nix            # Python (uv, pip), PHP, JDK 21, VS Code, Docker, LaTeX/LuaTeX
-│       ├── security.nix       # Pwn, Web, Reversing, Crypto, Stego (Ghidra, Pwndbg, Sage, MTP)
-│       ├── desktop.nix        # Daily desktop tools (Firefox, Thunar, GIMP, VLC, Vesktop, Zathura)
-│       └── gaming.nix         # Steam, GameMode, Proton-GE optimizations
-└── hosts/                     # Machine entrypoints (flake.nixosConfigurations.<host>)
-    ├── vm/                    # QEMU/KVM Virtual Machine (#vm)
-    └── laptop/                # Physical Laptop with Nvidia, UEFI & Power (#laptop)
+├── settings.nix           # User and regional defaults
+├── features/              # Reusable NixOS modules
+│   ├── system/            # OS foundation, desktop sessions, shells, networking, power
+│   │   ├── base.nix       # Base system, user virgola, nix-ld, fonts, GC and deduplication
+│   │   ├── mangowm.nix    # MangoWM Wayland session and autostart
+│   │   ├── noctalia.nix   # Noctalia v5 shell
+│   │   ├── niri.nix       # Niri scrollable tiling compositor fallback
+│   │   ├── wireguard.nix  # WireGuard and Fortinet SSL VPN suite (openfortivpn)
+│   │   ├── laptop.nix     # UPower, power-profiles-daemon, lid switch, Blueman
+│   │   ├── nvidia.nix     # Nvidia drivers and PRIME offload
+│   │   └── zsh.nix        # Zsh shell, Starship prompt, aliases, vault scripts
+│   └── apps/              # Application suites and developer stacks
+│       ├── dev.nix        # Python (uv, pip), PHP, JDK 21, VS Code, Docker, LaTeX/LuaTeX
+│       ├── security.nix   # Pwn, web, reversing, crypto, stego (Ghidra, Pwndbg, Sage, MTP)
+│       ├── desktop.nix    # Desktop tools (Firefox, Thunar, GIMP, VLC, Vesktop, Zathura)
+│       └── gaming.nix     # Steam, GameMode, Proton-GE optimizations
+└── hosts/                 # Machine definitions (flake.nixosConfigurations.<host>)
+    ├── vm/                # QEMU/KVM virtual machine (#vm)
+    └── laptop/            # Laptop with Nvidia, UEFI, and power profiles (#laptop)
 ```
 
----
+## Module organization
 
-## 1. The Two-Layer Pattern
+### Reusable features (features/)
+Files under `features/system/` and `features/apps/` define modules exposed through `flake.nixosModules.<name>`.
+- Features define packages, services, udev rules, firewall ports, and PAM modules independently of specific hardware.
+- Hosts import the features they need through `imports = [ ... ]`.
 
-### Layer 1: Reusable Features (`features/`)
-Each file under `features/system/` or `features/apps/` declares one or more reusable NixOS modules exposed via `flake.nixosModules.<name>`.
-- **Pure & Parameter-Free**: Features define *what* a capability requires (packages, systemd services, udev rules, firewall ports, PAM modules) without tying itself to a specific hardware device.
-- **Composable**: Any host can pick and choose features simply by importing them in `imports = [ ... ]`.
-
-### Layer 2: Machine Assemblies (`hosts/`)
-Each directory under `hosts/<hostname>/` defines a concrete system exposed via `flake.nixosConfigurations.<hostname>`.
-- A host imports the specific feature modules it requires.
-- It sets machine-specific attributes:
+### Machine assemblies (hosts/)
+Directories under `hosts/<hostname>/` define concrete systems exposed through `flake.nixosConfigurations.<hostname>`.
+- A host imports required feature modules.
+- Sets machine attributes:
   - `networking.hostName = "<hostname>";`
-  - Bootloader selection (`boot.loader.grub` for VM, `boot.loader.systemd-boot` for Laptop)
-  - Generated hardware scan (`hardware.nix`)
-  - Machine-specific overrides (such as `services.openssh.enable = false;` on laptop)
+  - Bootloader configuration (`boot.loader.grub` for VM, `boot.loader.systemd-boot` for laptop)
+  - Hardware scan (`hardware.nix`)
+  - Host overrides (such as disabling OpenSSH on the laptop)
 
----
+## System defaults (settings.nix and base.nix)
 
-## 2. Core System Defaults (`settings.nix` & `base.nix`)
+Hosts import `self.nixosModules.base`, which reads defaults from `nixos/settings.nix`:
+- Primary user: set through `config.custom.username` (defaults to `virgola`), with membership in `wheel`, `networkmanager`, `docker`, `wireshark`, `video`, and `audio`.
+- Storage maintenance:
+  - Weekly garbage collection (`nix.gc` with `--delete-older-than 7d`).
+  - Weekly store deduplication (`nix.optimise`) and continuous deduplication (`auto-optimise-store = true`).
+  - Low-disk protection: runs garbage collection when free space drops below 5 GiB, aiming for 10 GiB free.
+  - Bootloader limits: keeps the last 10 generations in GRUB and systemd-boot.
+- Fonts: `Noto Color Emoji`, `Noto Sans CJK`, and `JetBrains Mono Nerd Font` with fontconfig fallbacks across terminals, browsers, Noctalia, and Discord.
+- Desktop services: Polkit agent (`security.polkit.enable = true`), GNOME Keyring with PAM unlock, and GVFS for automounting and trash support.
+- Prebuilt binary compatibility: `programs.nix-ld.enable = true` configured with glib, OpenSSL, zlib, libGL, and C++ runtimes so prebuilt binaries run without manual patching.
 
-All hosts import `self.nixosModules.base`, which sources centralized user and regional settings from `nixos/settings.nix`:
-- **Primary User**: Configured via `config.custom.username` (defaults to `virgola` / Alessandro), member of `wheel`, `networkmanager`, `docker`, `wireshark`, `video`, `audio`.
-- **Storage Hygiene**:
-  - Weekly automated garbage collection (`nix.gc` with `--delete-older-than 7d`).
-  - Weekly store deduplication (`nix.optimise`) and live store deduplication (`auto-optimise-store = true`).
-  - Low-disk guards: Automatic GC triggered if free space drops below 5 GiB, targeting 10 GiB free.
-  - Bootloader generation limits: Capped at the last 10 generations on both GRUB and systemd-boot.
-- **Font Stack**: System-wide `Noto Color Emoji`, `Noto Sans CJK`, and `JetBrains Mono Nerd Font` with explicit fontconfig fallbacks to guarantee zero missing glyphs across terminals, browsers, Noctalia bar, and Discord.
-- **Desktop Plumbing**: Polkit authorization daemon (`security.polkit.enable = true`), GNOME Keyring with PAM auto-unlock on login/SDDM, and GVFS for automounting and Thunar trash support.
-- **Dynamic Binary Compatibility**: `programs.nix-ld.enable = true` configured with glib, openssl, zlib, libGL, and C++ runtimes so prebuilt binaries (uv wheels, foreign tools) execute natively without manual patchelf.
-
----
-
-## 3. Host Rebuild & Management Commands
-
-Apply or test changes directly from the repository root:
+## Rebuild and management commands
 
 ```bash
-# 1. Switch active system configuration:
+# Apply configuration:
 sudo nixos-rebuild switch --flake .#vm      # On VM
-sudo nixos-rebuild switch --flake .#laptop  # On Laptop
+sudo nixos-rebuild switch --flake .#laptop  # On laptop
 
-# 2. Test configuration without creating a boot entry:
+# Test configuration without adding a boot entry:
 sudo nixos-rebuild test --flake .#laptop
 
-# 3. Build toplevel derivation without applying (dry run check):
+# Build system derivation without switching:
 nix build .#nixosConfigurations.laptop.config.system.build.toplevel --no-link
 
-# 4. Roll back to the previous generation:
+# Roll back to the previous generation:
 sudo nixos-rebuild switch --rollback
 ```

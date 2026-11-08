@@ -1,0 +1,11 @@
+{
+  "name": "c-cpp",
+  "aliases": [
+    "c",
+    "cpp",
+    "c++"
+  ],
+  "description": "C and C++ project with Clang, CMake, Ninja, GDB, and clang-tools",
+  "category": "Systems & General Purpose",
+  "run": "cmake -B build -G Ninja && ninja -C build && ./build/main"
+}

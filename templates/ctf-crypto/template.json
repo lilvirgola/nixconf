@@ -1,0 +1,10 @@
+{
+  "name": "ctf-crypto",
+  "aliases": [
+    "crypto",
+    "cryptography"
+  ],
+  "description": "CTF cryptography with gmpy2, sympy, z3-solver, pycryptodome, hashcat, and john",
+  "category": "Security & CTF",
+  "run": "python3 solve.py"
+}

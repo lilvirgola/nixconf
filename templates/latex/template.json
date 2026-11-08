@@ -1,0 +1,9 @@
+{
+  "name": "latex",
+  "aliases": [
+    "tex"
+  ],
+  "description": "LaTeX project with LuaTeX, TeX Live Full, tectonic, texlab, and zathura",
+  "category": "Document & Typesetting",
+  "run": "tectonic main.tex"
+}

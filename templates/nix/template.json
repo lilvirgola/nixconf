@@ -1,0 +1,9 @@
+{
+  "name": "nix",
+  "aliases": [
+    "flake"
+  ],
+  "description": "Nix flake and packaging workspace with nixd LSP, statix, and alejandra",
+  "category": "Enterprise & Languages",
+  "run": "nix flake check"
+}

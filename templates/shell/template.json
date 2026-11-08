@@ -1,0 +1,11 @@
+{
+  "name": "shell",
+  "aliases": [
+    "sh",
+    "bash",
+    "shellscript"
+  ],
+  "description": "Bash and POSIX shell scripting with shellcheck and shfmt",
+  "category": "Web & Runtimes",
+  "run": "bash script.sh"
+}

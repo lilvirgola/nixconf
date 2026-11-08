@@ -1,0 +1,12 @@
+{
+  "name": "rust-gui",
+  "aliases": [
+    "gui-rust",
+    "gpui",
+    "bevy",
+    "egui"
+  ],
+  "description": "Rust GUI and game development (GPUI, Bevy, Egui) with Wayland, Vulkan, and fontconfig",
+  "category": "Systems & General Purpose",
+  "run": "cargo run"
+}

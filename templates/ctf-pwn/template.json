@@ -1,0 +1,10 @@
+{
+  "name": "ctf-pwn",
+  "aliases": [
+    "pwn",
+    "exploit"
+  ],
+  "description": "CTF binary exploitation with pwntools, ropper, ROPgadget, one_gadget, GDB/GEF, and angr",
+  "category": "Security & CTF",
+  "run": "python3 exploit.py"
+}

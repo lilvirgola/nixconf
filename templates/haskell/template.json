@@ -1,0 +1,9 @@
+{
+  "name": "haskell",
+  "aliases": [
+    "hs"
+  ],
+  "description": "Haskell project with GHC, Cabal, and Haskell Language Server",
+  "category": "Enterprise & Languages",
+  "run": "runhaskell Main.hs"
+}

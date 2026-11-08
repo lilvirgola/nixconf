@@ -1,0 +1,9 @@
+{
+  "name": "bun",
+  "aliases": [
+    "js-bun"
+  ],
+  "description": "Bun JavaScript and TypeScript runtime with package manager and test runner",
+  "category": "Web & Runtimes",
+  "run": "bun run index.ts"
+}

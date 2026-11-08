@@ -1,0 +1,10 @@
+{
+  "name": "csharp",
+  "aliases": [
+    "cs",
+    "dotnet"
+  ],
+  "description": "C# and .NET 9 project with dotnet SDK and OmniSharp",
+  "category": "Enterprise & Languages",
+  "run": "dotnet run"
+}

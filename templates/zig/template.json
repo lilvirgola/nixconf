@@ -1,0 +1,7 @@
+{
+  "name": "zig",
+  "aliases": [],
+  "description": "Zig project with zig compiler, zls language server, and GDB",
+  "category": "Systems & General Purpose",
+  "run": "zig build run"
+}

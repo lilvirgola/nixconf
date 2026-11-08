@@ -1,0 +1,9 @@
+{
+  "name": "typst",
+  "aliases": [
+    "typ"
+  ],
+  "description": "Typst document project with typst compiler, typstyle, and tinymist LSP",
+  "category": "Document & Typesetting",
+  "run": "typst watch main.typ"
+}

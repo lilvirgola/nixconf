@@ -1,0 +1,9 @@
+{
+  "name": "elixir",
+  "aliases": [
+    "ex"
+  ],
+  "description": "Elixir project with Erlang/OTP, mix, and rebar3",
+  "category": "Enterprise & Languages",
+  "run": "elixir main.exs"
+}

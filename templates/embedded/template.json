@@ -1,0 +1,12 @@
+{
+  "name": "embedded",
+  "aliases": [
+    "arm",
+    "pio",
+    "platformio",
+    "tinygo"
+  ],
+  "description": "Microcontroller project with PlatformIO Core, ARM GCC, and TinyGo",
+  "category": "Systems & General Purpose",
+  "run": "pio run"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "typescript",
+  "aliases": [
+    "ts",
+    "node",
+    "js"
+  ],
+  "description": "TypeScript and Node.js 22 project with pnpm, tsc, and Biome",
+  "category": "Web & Runtimes",
+  "run": "pnpm install && pnpm dev"
+}

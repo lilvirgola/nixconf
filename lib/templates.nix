@@ -72,25 +72,46 @@
       path = ../templates/nix;
       description = "Nix flake and packaging workspace with nixd LSP, statix linter, and alejandra formatter";
     };
-    pwn = {
-      path = ../templates/pwn;
-      description = "CTF & binary exploitation workspace with Pwntools, Ropper, ROPgadget, one_gadget, GDB, and socat";
+    ctf-base = {
+      path = ../templates/ctf-base;
+      description = "CTF base environment with CLI analysis, forensics, and Python tooling";
     };
-    reversing = {
-      path = ../templates/reversing;
-      description = "Reverse engineering workspace with Radare2, Rizin, Ghidra, Hexyl, Capstone, and Unicorn";
+    ctf-pwn = {
+      path = ../templates/ctf-pwn;
+      description = "CTF binary exploitation workspace with Pwntools, Ropper, ROPgadget, one_gadget, GDB/GEF, and angr";
     };
-    ctf-web = {
-      path = ../templates/ctf-web;
-      description = "CTF web exploitation workspace with ffuf, sqlmap, mitmproxy, socat, requests, and httpx";
+    ctf-rev = {
+      path = ../templates/ctf-rev;
+      description = "CTF reverse engineering workspace with Ghidra, Rizin, Radare2, Jadx, Apktool, and Capstone";
     };
     ctf-crypto = {
       path = ../templates/ctf-crypto;
-      description = "CTF cryptography workspace with gmpy2, sympy, z3-solver, pycryptodome, and hashcat";
+      description = "CTF cryptography workspace with gmpy2, sympy, z3-solver, pycryptodome, hashcat, and john";
+    };
+    ctf-web = {
+      path = ../templates/ctf-web;
+      description = "CTF web exploitation workspace with ffuf, sqlmap, nikto, gobuster, mitmproxy, and httpx";
+    };
+    ctf-osint = {
+      path = ../templates/ctf-osint;
+      description = "CTF OSINT & reconnaissance workspace with sherlock, theHarvester, holehe, socialscan, and volatility3";
     };
     ctf-network = {
       path = ../templates/ctf-network;
       description = "CTF network & PCAP analysis workspace with tshark, termshark, tcpdump, scapy, and pyshark";
+    };
+    ctf-full = {
+      path = ../templates/ctf-full;
+      description = "Complete all-in-one CTF workspace with pwn, rev, crypto, web, osint, and network tooling";
+    };
+    # Backward compatibility aliases
+    pwn = {
+      path = ../templates/ctf-pwn;
+      description = "Alias for ctf-pwn";
+    };
+    reversing = {
+      path = ../templates/ctf-rev;
+      description = "Alias for ctf-rev";
     };
   };
 }

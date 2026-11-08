@@ -1,0 +1,11 @@
+{
+  "name": "ctf-rev",
+  "aliases": [
+    "rev",
+    "reversing",
+    "disasm"
+  ],
+  "description": "CTF reverse engineering with Ghidra, Rizin, Radare2, Jadx, Apktool, and Capstone",
+  "category": "Security & CTF",
+  "run": "python3 solve.py"
+}

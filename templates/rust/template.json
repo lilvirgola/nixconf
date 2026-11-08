@@ -1,0 +1,9 @@
+{
+  "name": "rust",
+  "aliases": [
+    "rs"
+  ],
+  "description": "Rust project with cargo, rustc, rust-analyzer, clippy, and rustfmt",
+  "category": "Systems & General Purpose",
+  "run": "cargo run"
+}

@@ -1,42 +1,38 @@
-# `nixos/hosts/` — Machine Definitions & Host Assemblies
+# Machine definitions in nixos/hosts/
 
-Each subdirectory in `nixos/hosts/<hostname>/` defines a complete, independent machine configuration exposed as `flake.nixosConfigurations.<hostname>`.
+Each subdirectory in `nixos/hosts/<hostname>/` defines a machine configuration exposed as `flake.nixosConfigurations.<hostname>`.
 
----
+## Hosts comparison
 
-## Current Hosts Comparison Matrix
-
-| Feature | Virtual Machine (`#vm`) | Physical Laptop (`#laptop`) |
+| Feature | Virtual machine (`#vm`) | Physical laptop (`#laptop`) |
 | :--- | :--- | :--- |
-| **Target Architecture** | QEMU / KVM Virtual Machine | Physical Portable Workstation |
-| **Bootloader** | GRUB (`boot.loader.grub.device = "/dev/vda"`) | UEFI systemd-boot (`boot.loader.systemd-boot`) |
-| **Boot Limit** | Last 10 generations | Last 10 generations |
-| **Kernel** | `linuxPackages_latest` | `linuxPackages_latest` |
-| **SSH Daemon (`sshd`)** | **Enabled** by default (`services.openssh.enable = true`) | **Disabled** by default (`services.openssh.enable = false`) |
-| **Graphics & GPU** | Virtual display (QXL / Bochs / VirtIO) | Nvidia Proprietary + PRIME Offload |
-| **Display Manager** | SDDM + Catppuccin Mocha theme | SDDM + Catppuccin Mocha theme |
-| **Desktop Session** | MangoWM + Noctalia floating bar | MangoWM + Noctalia floating bar |
-| **Power Management** | Disabled (Virtual) | UPower, `power-profiles-daemon`, lid switch suspend |
-| **Bluetooth** | Disabled | BlueZ + Blueman GUI applet (`services.blueman`) |
-| **Development Suite** | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) |
-| **Security & CTF Suite** | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) |
-| **Gaming** | Steam & GameMode | Steam, GameMode, Nvidia offload |
+| Target architecture | QEMU / KVM virtual machine | Physical laptop workstation |
+| Bootloader | GRUB (`boot.loader.grub.device = "/dev/vda"`) | UEFI systemd-boot (`boot.loader.systemd-boot`) |
+| Boot limit | Last 10 generations | Last 10 generations |
+| Kernel | `linuxPackages_latest` | `linuxPackages_latest` |
+| SSH daemon (`sshd`) | Enabled (`services.openssh.enable = true`) | Disabled (`services.openssh.enable = false`) |
+| Graphics | Virtual display (QXL / Bochs / VirtIO) | Nvidia proprietary with PRIME offload |
+| Display manager | SDDM with Catppuccin Mocha theme | SDDM with Catppuccin Mocha theme |
+| Desktop session | MangoWM with Noctalia floating bar | MangoWM with Noctalia floating bar |
+| Power management | Disabled | UPower, `power-profiles-daemon`, lid switch suspend |
+| Bluetooth | Disabled | BlueZ and Blueman applet (`services.blueman`) |
+| Development suite | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) |
+| Security suite | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) |
+| Gaming | Steam and GameMode | Steam, GameMode, Nvidia offload |
 
----
+## Host file structure
 
-## Standard 3-File Host Structure
-
-Every host follows an identical 3-file convention:
+Each host uses three files:
 
 ```text
 nixos/hosts/<hostname>/
 ├── default.nix          # Flake output definition (nixosSystem call)
-├── configuration.nix    # Feature module imports & host-specific overrides
-└── hardware.nix         # Hardware scan (file systems, kernel modules, CPU microcode)
+├── configuration.nix    # Feature module imports and host overrides
+└── hardware.nix         # Hardware scan (filesystems, kernel modules, CPU microcode)
 ```
 
-### 1. `default.nix`
-Wires the system up using `inputs.nixpkgs.lib.nixosSystem`:
+### 1. default.nix
+Builds the system with `inputs.nixpkgs.lib.nixosSystem`:
 ```nix
 {
   inputs,
@@ -52,8 +48,8 @@ Wires the system up using `inputs.nixpkgs.lib.nixosSystem`:
 }
 ```
 
-### 2. `configuration.nix`
-Declares `flake.nixosModules.<hostname>Configuration`, selecting features and setting host settings:
+### 2. configuration.nix
+Declares `flake.nixosModules.<hostname>Configuration`, selecting features and setting host options:
 ```nix
 {self, ...}: {
   flake.nixosModules.myhostConfiguration = {pkgs, ...}: {
@@ -68,7 +64,6 @@ Declares `flake.nixosModules.<hostname>Configuration`, selecting features and se
 
     networking.hostName = "myhost";
 
-    # UEFI Bootloader
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 10;
     boot.loader.efi.canTouchEfiVariables = true;
@@ -77,8 +72,8 @@ Declares `flake.nixosModules.<hostname>Configuration`, selecting features and se
 }
 ```
 
-### 3. `hardware.nix`
-Wraps the output of `nixos-generate-config --show-hardware-config`:
+### 3. hardware.nix
+Contains hardware-specific configuration from `nixos-generate-config --show-hardware-config`:
 ```nix
 {
   flake.nixosModules.myhostHardware = {
@@ -93,45 +88,41 @@ Wraps the output of `nixos-generate-config --show-hardware-config`:
 }
 ```
 
----
+## Provisioning with bootstrap.sh
 
-## Automated Provisioning with `bootstrap.sh`
-
-To set up a fresh machine automatically:
+To provision a new machine:
 ```bash
-# Run the interactive bootstrapper:
+# Interactive setup:
 bash bootstrap.sh
 
-# Or non-interactively for the laptop:
+# Non-interactive for the laptop:
 bash bootstrap.sh --host laptop
 ```
-The script will:
-1. Probe hardware devices and generate `hardware.nix`.
-2. Back up any prior configuration.
-3. Prompt to set user passwords.
-4. Verify flake formatting and evaluation.
-5. Rebuild and activate the system.
 
----
+The script:
+1. Detects hardware devices and generates `hardware.nix`.
+2. Backs up existing configuration.
+3. Prompts for user passwords.
+4. Checks flake formatting and evaluation.
+5. Rebuilds and activates the system.
 
-## Adding a New Host Manually
+## Adding a new host manually
 
-1. **Create Directory**:
+1. Create the host directory:
    ```bash
    mkdir -p nixos/hosts/my-desktop
    ```
-2. **Generate Hardware Scan**:
+2. Generate the hardware scan:
    ```bash
    nixos-generate-config --show-hardware-config > nixos/hosts/my-desktop/hardware.nix
    ```
    Wrap the output in `{ flake.nixosModules.myDesktopHardware = { config, lib, pkgs, modulesPath, ... }: { ... }; }`.
-3. **Create `configuration.nix` & `default.nix`** using the templates above.
-4. **Stage in Git**:
+3. Create `configuration.nix` and `default.nix` using the templates above.
+4. Stage files in Git:
    ```bash
    git add nixos/hosts/my-desktop
    ```
-5. **Switch**:
+5. Apply configuration:
    ```bash
    sudo nixos-rebuild switch --flake .#my-desktop
    ```
-Because `flake.nix` uses the Dendritic auto-importer, `my-desktop` is immediately exposed as `.#my-desktop` without touching `flake.nix`!

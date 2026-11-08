@@ -1,0 +1,12 @@
+{
+  "name": "ctf-web",
+  "aliases": [
+    "web",
+    "web-sec",
+    "webctf",
+    "pentest"
+  ],
+  "description": "CTF web exploitation with ffuf, sqlmap, nikto, gobuster, mitmproxy, and httpx",
+  "category": "Security & CTF",
+  "run": "python3 exploit.py"
+}

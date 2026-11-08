@@ -10,26 +10,28 @@
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
     devShells = forAllSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pythonEnv = pkgs.python3.withPackages (p:
+        with p; [
+          scapy
+          pyshark
+          dpkt
+          requests
+          httpx
+          ipython
+        ]);
     in {
       default = pkgs.mkShell {
         packages = with pkgs; [
-          # Packet analysis & Capturing
-          wireshark-cli # tshark
+          wireshark-cli
           termshark
           tcpdump
           nmap
           socat
-
-          # Python packet parsing & network forensics
-          (python3.withPackages (ps: [
-            ps.scapy
-            ps.pyshark
-            ps.dpkt
-            ps.pwntools
-            ps.requests
-            ps.httpx
-          ]))
+          pythonEnv
         ];
 
         shellHook = ''

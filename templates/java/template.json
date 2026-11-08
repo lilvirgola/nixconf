@@ -1,0 +1,10 @@
+{
+  "name": "java",
+  "aliases": [
+    "gradle",
+    "maven"
+  ],
+  "description": "Java project with OpenJDK 21, Gradle, and Maven",
+  "category": "Enterprise & Languages",
+  "run": "gradle run"
+}

@@ -1,267 +1,413 @@
 {inputs, ...}: {
   perSystem = {pkgs, ...}: let
-    ninitScript = pkgs.writeShellApplication {
-      name = "ninit";
-      runtimeInputs = with pkgs; [
-        fzf
-        git
-        direnv
-        coreutils
-        gawk
-      ];
-      text = ''
-        NIXCONF=""
-        if [ -n "''${NIXCONF_DIR:-}" ] && [ -d "$NIXCONF_DIR/templates" ]; then
-          NIXCONF="$NIXCONF_DIR"
-        elif [ -d "$HOME/nixconf/templates" ]; then
-          NIXCONF="$HOME/nixconf"
-        elif [ -d "/etc/nixos/templates" ]; then
-          NIXCONF="/etc/nixos"
-        else
-          echo "[!] Could not locate nixconf templates directory."
-          exit 1
-        fi
+    pythonEnv = pkgs.python3.withPackages (p: [
+      p.rich
+      p.questionary
+    ]);
 
-        TEMPLATE="''${1:-}"
-        TARGET_DIR="''${2:-}"
+    ninitScript = pkgs.writeScriptBin "ninit" ''
+      #!${pythonEnv}/bin/python3
+      """
+      ninit — Automated Nix Flake Project Scaffolder & Template Manager
+      """
+      import os
+      import sys
+      import json
+      import re
+      import shutil
+      import subprocess
+      from rich.console import Console
+      from rich.table import Table
+      from rich.panel import Panel
+      import questionary
+      from questionary import Choice, Separator, Style
 
-        case "$TEMPLATE" in
-          py|python|uv) TEMPLATE="python-uv" ;;
-          golang) TEMPLATE="go" ;;
-          rs) TEMPLATE="rust" ;;
-          rust-gui|gui-rust|gpui|bevy|egui) TEMPLATE="rust-gui" ;;
-          zig) TEMPLATE="zig" ;;
-          typst|typ) TEMPLATE="typst" ;;
-          tex) TEMPLATE="latex" ;;
-          ts|node|js) TEMPLATE="typescript" ;;
-          bun) TEMPLATE="bun" ;;
-          c|cpp|c++) TEMPLATE="c-cpp" ;;
-          arm|pio|platformio|tinygo) TEMPLATE="embedded" ;;
-          php) TEMPLATE="php" ;;
-          sh|bash|shellscript) TEMPLATE="shell" ;;
-          java|gradle|maven) TEMPLATE="java" ;;
-          cs|csharp|dotnet) TEMPLATE="csharp" ;;
-          ex|elixir) TEMPLATE="elixir" ;;
-          hs|haskell) TEMPLATE="haskell" ;;
-          nix|flake) TEMPLATE="nix" ;;
-          ctf|exploit|security|pwn) TEMPLATE="pwn" ;;
-          rev|reversing|ghidra|radare2|disasm) TEMPLATE="reversing" ;;
-          web-sec|ctf-web|webctf|pentest) TEMPLATE="ctf-web" ;;
-          crypto|ctf-crypto|cryptography) TEMPLATE="ctf-crypto" ;;
-          net|network|pcap|ctf-network|traffic) TEMPLATE="ctf-network" ;;
-        esac
+      console = Console()
 
-        if [ -z "$TEMPLATE" ]; then
-          AVAILABLE_TEMPLATES=(
-            "python-uv   - Python project with uv, ruff, pyright, and nix-ld"
-            "go          - Go project with gopls, golangci-lint, and delve"
-            "rust        - Rust project with cargo, rustc, rust-analyzer, clippy, rustfmt"
-            "rust-gui    - Rust GUI/Game (GPUI, Bevy, Egui) with Wayland, Vulkan, Fontconfig"
-            "zig         - Zig project with zig compiler, zls LSP, and GDB"
-            "typst       - Modern typesetting with Typst, typstyle, and tinymist"
-            "latex       - LaTeX project with LuaTeX, TeX Live Full, tectonic, and texlab"
-            "typescript  - TypeScript & Node.js 22 project with pnpm, tsc, and Biome"
-            "bun         - High-performance JavaScript/TypeScript with Bun"
-            "c-cpp       - Modern C/C++ project with Clang, CMake, Ninja, GDB, Valgrind"
-            "embedded    - Microcontroller project with PlatformIO, ARM GCC, TinyGo"
-            "php         - PHP project with PHP 8.5 CLI and Composer"
-            "shell       - Bash & POSIX shell scripting with shellcheck and shfmt"
-            "java        - Java project with OpenJDK 21, Gradle, and Maven"
-            "csharp      - C# / .NET 9 project with dotnet SDK and Omnisharp"
-            "elixir      - Elixir project with Erlang/OTP, mix, and rebar3"
-            "haskell     - Haskell project with GHC, Cabal, and Haskell Language Server"
-            "nix         - Nix flake & packaging with nixd, statix, and alejandra"
-            "pwn         - CTF binary exploitation with Pwntools, Ropper, ROPgadget, one_gadget, socat"
-            "reversing   - Reverse engineering with Radare2, Rizin, Ghidra, Hexyl, Capstone"
-            "ctf-web     - CTF web exploitation with ffuf, sqlmap, mitmproxy, and httpx"
-            "ctf-crypto  - CTF cryptography with gmpy2, sympy, z3-solver, pycryptodome, hashcat"
-            "ctf-network - CTF network & PCAP analysis with tshark, termshark, tcpdump, scapy"
+      CUSTOM_STYLE = Style([
+          ("qmark", "fg:#89dceb bold"),
+          ("question", "bold"),
+          ("answer", "fg:#a6e3a1 bold"),
+          ("pointer", "fg:#f38ba8 bold"),
+          ("highlighted", "fg:#89b4fa bold"),
+          ("selected", "fg:#a6e3a1"),
+          ("instruction", "fg:#6c7086 italic"),
+          ("separator", "fg:#cba6f7 bold"),
+      ])
+
+      CATEGORY_ORDER = [
+          "Systems & General Purpose",
+          "Web & Runtimes",
+          "Document & Typesetting",
+          "Enterprise & Languages",
+          "Security & CTF",
+          "Other",
+      ]
+
+      def find_nixconf_dir():
+          env_dir = os.environ.get("NIXCONF_DIR")
+          if env_dir and os.path.isdir(os.path.join(env_dir, "templates")):
+              return os.path.abspath(env_dir)
+
+          home_nixconf = os.path.expanduser("~/nixconf")
+          if os.path.isdir(os.path.join(home_nixconf, "templates")):
+              return home_nixconf
+
+          etc_nixos = "/etc/nixos"
+          if os.path.isdir(os.path.join(etc_nixos, "templates")):
+              return etc_nixos
+
+          cwd = os.getcwd()
+          if os.path.isdir(os.path.join(cwd, "templates")) and os.path.isfile(os.path.join(cwd, "flake.nix")):
+              return cwd
+
+          console.print("[bold red][!] Could not locate nixconf templates directory.[/bold red]")
+          console.print("[dim]Set $NIXCONF_DIR or ensure ~/nixconf/templates exists.[/dim]")
+          sys.exit(1)
+
+      def parse_flake_nix(filepath):
+          desc = ""
+          aliases = []
+          run_cmd = ""
+          try:
+              with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                  for line in f:
+                      if not desc:
+                          m_desc = re.search(r'description\s*=\s*"([^"]+)"', line)
+                          if m_desc:
+                              desc = m_desc.group(1).strip()
+                      m_alias = re.match(r"^#\s*Aliases:\s*(.*)", line.strip(), re.IGNORECASE)
+                      if m_alias:
+                          aliases.extend([a.strip() for a in m_alias.group(1).split(",") if a.strip()])
+                      m_run = re.match(r"^#\s*Run:\s*(.*)", line.strip(), re.IGNORECASE)
+                      if m_run:
+                          run_cmd = m_run.group(1).strip()
+          except Exception:
+              pass
+          return desc, aliases, run_cmd
+
+      def load_templates(nixconf_dir):
+          templates_dir = os.path.join(nixconf_dir, "templates")
+          if not os.path.isdir(templates_dir):
+              return []
+
+          templates = []
+          for entry in sorted(os.listdir(templates_dir)):
+              entry_path = os.path.join(templates_dir, entry)
+              if not os.path.isdir(entry_path):
+                  continue
+              if entry.startswith("."):
+                  continue
+
+              meta_file = os.path.join(entry_path, "template.json")
+              if os.path.isfile(meta_file):
+                  try:
+                      with open(meta_file, "r", encoding="utf-8") as f:
+                          data = json.load(f)
+                      name = data.get("name", entry)
+                      aliases = data.get("aliases", [])
+                      desc = data.get("description", "")
+                      cat = data.get("category", "Other")
+                      run = data.get("run", "")
+                  except Exception:
+                      name = entry
+                      aliases = []
+                      desc = ""
+                      cat = "Other"
+                      run = ""
+              else:
+                  flake_path = os.path.join(entry_path, "flake.nix")
+                  f_desc, f_aliases, f_run = parse_flake_nix(flake_path)
+                  name = entry
+                  aliases = f_aliases
+                  desc = f_desc or f"{entry} template"
+                  cat = "Other"
+                  run = f_run
+
+              templates.append({
+                  "name": name,
+                  "folder": entry,
+                  "aliases": aliases,
+                  "description": desc,
+                  "category": cat,
+                  "run": run,
+                  "path": entry_path,
+              })
+
+          return templates
+
+      def build_alias_map(templates):
+          alias_map = {}
+          for tmpl in templates:
+              alias_map[tmpl["name"].lower()] = tmpl
+              alias_map[tmpl["folder"].lower()] = tmpl
+              for alias in tmpl["aliases"]:
+                  alias_map[alias.lower()] = tmpl
+          return alias_map
+
+      def cmd_list(templates):
+          table = Table(
+              title="Available Project Templates",
+              title_style="bold cyan",
+              border_style="bright_blue",
+              header_style="bold magenta",
+          )
+          table.add_column("Template", style="bold green", no_wrap=True)
+          table.add_column("Aliases", style="yellow")
+          table.add_column("Category", style="cyan")
+          table.add_column("Description", style="white")
+          table.add_column("Starter Command", style="dim green")
+
+          grouped = {}
+          for tmpl in templates:
+              cat = tmpl.get("category", "Other")
+              grouped.setdefault(cat, []).append(tmpl)
+
+          for cat in CATEGORY_ORDER:
+              if cat not in grouped:
+                  continue
+              for tmpl in grouped[cat]:
+                  aliases_str = ", ".join(tmpl["aliases"]) if tmpl["aliases"] else "-"
+                  table.add_row(
+                      tmpl["name"],
+                      aliases_str,
+                      tmpl["category"],
+                      tmpl["description"],
+                      tmpl["run"] or "-",
+                  )
+
+          console.print()
+          console.print(table)
+          console.print(f"[dim]Total: {len(templates)} templates discovered in templates/ directory[/dim]\n")
+
+      def cmd_help():
+          console.print(Panel.fit(
+              "[bold cyan]ninit — Nix Project Template Initializer[/bold cyan]\n\n"
+              "[bold]Usage:[/bold]\n"
+              "  ninit                     Interactive template picker and project setup\n"
+              "  ninit <template> [dir]    Initialize specific template in target directory\n"
+              "  ninit -l, --list          List all discovered templates and aliases in a table\n"
+              "  ninit -h, --help          Show this help reference\n\n"
+              "[bold]Examples:[/bold]\n"
+              "  ninit rust my-crate       Initialize Rust template in ./my-crate\n"
+              "  ninit py my-api           Initialize Python uv template in ./my-api\n"
+              "  ninit ctf-pwn challenge1  Initialize CTF pwn harness in ./challenge1\n"
+              "  ninit ctf-base            Initialize CTF base in current directory\n"
+              "  ninit                     Browse templates interactively with search",
+              border_style="cyan",
+          ))
+
+      def pick_target_directory(default_dir="."):
+          cwd = os.getcwd()
+          choices = [
+              Choice(title=f"Current directory ({cwd})", value="."),
+              Choice(title="Create a new directory", value="__new__"),
+          ]
+          try:
+              selected = questionary.select(
+                  "Target directory:",
+                  choices=choices,
+                  style=CUSTOM_STYLE,
+                  use_indicator=True,
+              ).ask()
+          except KeyboardInterrupt:
+              console.print("\n[red][!] Operation cancelled.[/red]")
+              sys.exit(130)
+
+          if not selected:
+              sys.exit(0)
+
+          if selected == "__new__":
+              try:
+                  new_dir = questionary.text(
+                      "Enter new directory name:",
+                      style=CUSTOM_STYLE,
+                      validate=lambda val: True if val.strip() else "Directory name cannot be empty.",
+                  ).ask()
+              except KeyboardInterrupt:
+                  console.print("\n[red][!] Operation cancelled.[/red]")
+                  sys.exit(130)
+
+              if not new_dir:
+                  sys.exit(0)
+              return new_dir.strip()
+
+          return default_dir
+
+      def init_project(nixconf_dir, template_info, target_dir):
+          tmpl_name = template_info["name"]
+          abs_target = os.path.abspath(target_dir) if target_dir != "." else os.getcwd()
+
+          if target_dir != ".":
+              os.makedirs(abs_target, exist_ok=True)
+              os.chdir(abs_target)
+
+          console.print(f"[bold cyan][+][/bold cyan] Initializing template '[bold green]{tmpl_name}[/bold green]' in [dim]{abs_target}[/dim]...")
+
+          flake_ref = f"{nixconf_dir}#{tmpl_name}"
+          proc = subprocess.run(
+              ["nix", "flake", "init", "-t", flake_ref],
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+              text=True,
           )
 
-          if command -v fzf >/dev/null 2>&1; then
-            CHOSEN=$(printf '%s\n' "''${AVAILABLE_TEMPLATES[@]}" | fzf --height 45% --reverse --prompt="Select project template > ")
-            if [ -z "$CHOSEN" ]; then
-              echo "[*] Aborted."
-              exit 0
-            fi
-            TEMPLATE=$(echo "$CHOSEN" | awk '{print $1}')
-          else
-            echo "Available templates:"
-            echo "  1) python-uv (py)     9) bun               17) haskell (hs)"
-            echo "  2) go                10) c-cpp (c, cpp)    18) nix"
-            echo "  3) rust (rs)         11) embedded (pio)    19) pwn (ctf)"
-            echo "  4) rust-gui          12) php               20) reversing (rev)"
-            echo "  5) zig               13) shell (sh, bash)  21) ctf-web"
-            echo "  6) typst             14) java              22) ctf-crypto (crypto)"
-            echo "  7) latex (tex)       15) csharp (cs)       23) ctf-network (net, pcap)"
-            echo "  8) typescript (ts)   16) elixir (ex)"
-            read -rp "Enter choice [1-23]: " choice
-            case "$choice" in
-              1|python-uv|py) TEMPLATE="python-uv" ;;
-              2|go) TEMPLATE="go" ;;
-              3|rust|rs) TEMPLATE="rust" ;;
-              4|rust-gui) TEMPLATE="rust-gui" ;;
-              5|zig) TEMPLATE="zig" ;;
-              6|typst|typ) TEMPLATE="typst" ;;
-              7|latex|tex) TEMPLATE="latex" ;;
-              8|typescript|ts|node) TEMPLATE="typescript" ;;
-              9|bun) TEMPLATE="bun" ;;
-              10|c-cpp|c|cpp) TEMPLATE="c-cpp" ;;
-              11|embedded|pio|arm) TEMPLATE="embedded" ;;
-              12|php) TEMPLATE="php" ;;
-              13|shell|sh|bash) TEMPLATE="shell" ;;
-              14|java) TEMPLATE="java" ;;
-              15|csharp|cs|dotnet) TEMPLATE="csharp" ;;
-              16|elixir|ex) TEMPLATE="elixir" ;;
-              17|haskell|hs) TEMPLATE="haskell" ;;
-              18|nix) TEMPLATE="nix" ;;
-              19|pwn|ctf|exploit) TEMPLATE="pwn" ;;
-              20|reversing|rev) TEMPLATE="reversing" ;;
-              21|ctf-web|web-sec) TEMPLATE="ctf-web" ;;
-              22|ctf-crypto|crypto) TEMPLATE="ctf-crypto" ;;
-              23|ctf-network|net|pcap) TEMPLATE="ctf-network" ;;
-              *) echo "[!] Invalid choice"; exit 1 ;;
-            esac
-          fi
-        fi
+          if proc.returncode != 0:
+              console.print(f"[bold red][!] nix flake init failed:[/bold red]\n{proc.stderr.strip()}")
+              sys.exit(proc.returncode)
 
-        if [ ! -d "$NIXCONF/templates/$TEMPLATE" ]; then
-          echo "[!] Unknown template: '$TEMPLATE'. Run ninit without arguments to browse available templates."
-          exit 1
-        fi
+          stray_meta = os.path.join(abs_target, "template.json")
+          if os.path.isfile(stray_meta):
+              try:
+                  os.remove(stray_meta)
+              except OSError:
+                  pass
 
-        if [ -z "$TARGET_DIR" ] && [ -t 0 ]; then
-          CURRENT_DIR="$(pwd)"
-          echo ""
-          echo "Select target directory:"
-          echo "  1) Current folder ($CURRENT_DIR)"
-          echo "  2) Create a new folder"
-          read -rp "Enter choice [1/2] (default: 1) or folder name: " dir_choice
-          case "$dir_choice" in
-            ""|1)
-              TARGET_DIR="."
-              ;;
-            2)
-              read -rp "Enter new folder name: " new_dir
-              while [ -z "$new_dir" ]; do
-                read -rp "Folder name cannot be empty. Enter folder name: " new_dir
-              done
-              TARGET_DIR="$new_dir"
-              ;;
-            *)
-              TARGET_DIR="$dir_choice"
-              ;;
-          esac
-        fi
+          git_check = subprocess.run(
+              ["git", "rev-parse", "--is-inside-work-tree"],
+              stdout=subprocess.DEVNULL,
+              stderr=subprocess.DEVNULL,
+          )
+          if git_check.returncode != 0:
+              subprocess.run(["git", "init", "-q"], check=False)
+              console.print("[bold cyan][+][/bold cyan] Initialized empty Git repository.")
 
-        if [ -n "$TARGET_DIR" ] && [ "$TARGET_DIR" != "." ]; then
-          mkdir -p "$TARGET_DIR"
-          cd "$TARGET_DIR"
-        fi
+          gitignore_path = os.path.join(abs_target, ".gitignore")
+          if not os.path.isfile(gitignore_path):
+              with open(gitignore_path, "w", encoding="utf-8") as f:
+                  f.write(".direnv/\nresult\nresult-*\n")
+          else:
+              try:
+                  with open(gitignore_path, "r", encoding="utf-8", errors="ignore") as f:
+                      content = f.read()
+                  if ".direnv" not in content:
+                      with open(gitignore_path, "a", encoding="utf-8") as f:
+                          f.write("\n# Direnv\n.direnv/\n")
+              except Exception:
+                  pass
 
-        echo "[+] Initializing '$TEMPLATE' template in $(pwd)..."
+          subprocess.run(["git", "add", "-A"], check=False)
+          console.print("[bold cyan][+][/bold cyan] Staged project files in Git.")
 
-        nix flake init -t "$NIXCONF#$TEMPLATE"
+          if os.path.isfile(os.path.join(abs_target, ".envrc")) and shutil.which("direnv"):
+              subprocess.run(["direnv", "allow"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+              console.print("[bold cyan][+][/bold cyan] Enabled direnv environment.")
 
-        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-          git init -q
-          echo "[+] Initialized empty Git repository."
-        fi
+          run_cmd = template_info.get("run", "")
+          run_hint = f"\n[bold yellow]Starter command:[/] [bold green]{run_cmd}[/]" if run_cmd else ""
 
-        # Ensure .direnv/ is ignored so it is not tracked by Git
-        if [ ! -f .gitignore ]; then
-          printf ".direnv/\nresult\nresult-*\n" > .gitignore
-        elif ! grep -q "^\.direnv" .gitignore; then
-          printf "\n# Direnv\n.direnv/\n" >> .gitignore
-        fi
+          console.print()
+          console.print(Panel(
+              f"[bold green]✔[/bold green] Project initialized successfully from template '[bold cyan]{tmpl_name}[/bold cyan]'!\n"
+              f"[dim]Directory:[/] [white]{abs_target}[/white]"
+              f"{run_hint}\n"
+              f"[dim]Direnv loaded: automatic isolated dev environment active.[/dim]",
+              title="[bold green]Ready[/bold green]",
+              border_style="green",
+              padding=(1, 2),
+          ))
 
-        # Nix flakes require flake.nix to be tracked in Git for evaluation
-        if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-          git add -A
-          echo "[+] Staged template files in Git."
-        fi
+      def interactive_picker(templates):
+          console.print()
+          console.print(Panel(
+              "[bold cyan]Nix Project Initializer[/bold cyan]\n"
+              "[dim]Select a template to bootstrap a new workspace:[/dim]",
+              border_style="cyan",
+              padding=(0, 2),
+          ))
 
-        if command -v direnv >/dev/null 2>&1 && [ -f .envrc ]; then
-          direnv allow
-          echo "[+] Enabled direnv environment."
-        fi
+          grouped = {}
+          for tmpl in templates:
+              cat = tmpl.get("category", "Other")
+              grouped.setdefault(cat, []).append(tmpl)
 
-        echo ""
-        echo "[✓] Project initialized successfully from template '$TEMPLATE'!"
-        case "$TEMPLATE" in
-          python-uv)
-            echo "    Run: uv run main.py"
-            ;;
-          go)
-            echo "    Run: go run ."
-            ;;
-          rust)
-            echo "    Run: cargo run"
-            ;;
-          rust-gui)
-            echo "    Run: cargo run  (Wayland, Vulkan, and graphics libraries preconfigured)"
-            ;;
-          zig)
-            echo "    Run: zig build run"
-            ;;
-          typst)
-            echo "    Run: typst watch main.typ  (or: typst compile main.typ)"
-            ;;
-          latex)
-            echo "    Run: tectonic main.tex  (or: lualatex main.tex / latexmk -pdf main.tex)"
-            ;;
-          typescript)
-            echo "    Run: pnpm install && pnpm dev  (build: pnpm build)"
-            ;;
-          bun)
-            echo "    Run: bun run index.ts  (watch: bun --watch index.ts)"
-            ;;
-          c-cpp)
-            echo "    Run: cmake -B build -G Ninja && ninja -C build && ./build/main"
-            ;;
-          embedded)
-            echo "    Run: pio run  (upload: pio run -t upload)"
-            ;;
-          php)
-            echo "    Run: composer install && php -S localhost:8000 -t public"
-            ;;
-          shell)
-            echo "    Run: bash script.sh  (lint: shellcheck script.sh)"
-            ;;
-          java)
-            echo "    Run: gradle run  (or: javac src/Main.java && java -cp src Main)"
-            ;;
-          csharp)
-            echo "    Run: dotnet run"
-            ;;
-          elixir)
-            echo "    Run: elixir main.exs  (or: iex -S mix)"
-            ;;
-          haskell)
-            echo "    Run: runhaskell Main.hs  (or: cabal run)"
-            ;;
-          nix)
-            echo "    Run: nix flake check  (lint: statix check, fmt: alejandra .)"
-            ;;
-          pwn)
-            echo "    Run: python3 exploit.py  (remote: python3 exploit.py REMOTE)"
-            ;;
-          reversing)
-            echo "    Run: rizin <binary>  (or: ghidra / python3 solve.py)"
-            ;;
-          ctf-web)
-            echo "    Run: python3 exploit.py  (fuzz: ffuf -u http://TARGET/FUZZ -w ...)"
-            ;;
-          ctf-crypto)
-            echo "    Run: python3 solve.py  (RSA, SMT solver, discrete log)"
-            ;;
-          ctf-network)
-            echo "    Run: tshark -r <file.pcap>  (or: termshark / python3 analyze_pcap.py <file.pcap>)"
-            ;;
-        esac
+          choices = []
+          for cat in CATEGORY_ORDER:
+              if cat not in grouped:
+                  continue
+              choices.append(Separator(f"─ {cat} ─"))
+              for tmpl in grouped[cat]:
+                  choices.append(Choice(
+                      title=f"[{tmpl['name']:<12}] • {tmpl['description']}",
+                      value=tmpl["name"],
+                  ))
+
+          try:
+              selected = questionary.select(
+                  "Choose template:",
+                  choices=choices,
+                  style=CUSTOM_STYLE,
+                  use_indicator=True,
+                  use_shortcuts=False,
+              ).ask()
+          except KeyboardInterrupt:
+              console.print("\n[red][!] Operation cancelled.[/red]")
+              sys.exit(130)
+
+          if not selected:
+              sys.exit(0)
+
+          return selected
+
+      def main():
+          nixconf_dir = find_nixconf_dir()
+          templates = load_templates(nixconf_dir)
+          alias_map = build_alias_map(templates)
+
+          args = sys.argv[1:]
+
+          if not args:
+              if not sys.stdin.isatty():
+                  cmd_list(templates)
+                  sys.exit(0)
+
+              chosen_name = interactive_picker(templates)
+              tmpl_info = alias_map.get(chosen_name.lower())
+              if not tmpl_info:
+                  console.print(f"[red][!] Template not found: {chosen_name}[/red]")
+                  sys.exit(1)
+
+              target_dir = pick_target_directory()
+              init_project(nixconf_dir, tmpl_info, target_dir)
+              sys.exit(0)
+
+          first_arg = args[0]
+
+          if first_arg in ("-h", "--help"):
+              cmd_help()
+              sys.exit(0)
+
+          if first_arg in ("-l", "--list"):
+              cmd_list(templates)
+              sys.exit(0)
+
+          tmpl_info = alias_map.get(first_arg.lower())
+          if not tmpl_info:
+              console.print(f"[bold red][!] Unknown template or alias:[/] '[yellow]{first_arg}[/yellow]'")
+              console.print("[dim]Run 'ninit --list' to view all available templates and aliases.[/dim]")
+              sys.exit(1)
+
+          if len(args) > 1:
+              target_dir = args[1]
+          elif sys.stdin.isatty():
+              target_dir = pick_target_directory()
+          else:
+              target_dir = "."
+
+          init_project(nixconf_dir, tmpl_info, target_dir)
+
+      if __name__ == "__main__":
+          main()
+    '';
+  in {
+    packages.ninit = pkgs.symlinkJoin {
+      name = "ninit";
+      paths = [ninitScript];
+      buildInputs = [pkgs.makeWrapper];
+      postBuild = ''
+        wrapProgram $out/bin/ninit \
+          --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [git nix direnv coreutils])}
       '';
     };
-  in {
-    packages.ninit = ninitScript;
   };
 }

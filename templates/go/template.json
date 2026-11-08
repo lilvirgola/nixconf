@@ -1,0 +1,9 @@
+{
+  "name": "go",
+  "aliases": [
+    "golang"
+  ],
+  "description": "Go project with gopls, golangci-lint, and delve",
+  "category": "Systems & General Purpose",
+  "run": "go run ."
+}

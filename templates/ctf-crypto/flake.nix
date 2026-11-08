@@ -1,5 +1,5 @@
 {
-  description = "CTF Cryptography & Cryptanalysis environment";
+  description = "CTF Cryptography (crypto) environment";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -10,25 +10,31 @@
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
     devShells = forAllSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pythonEnv = pkgs.python3.withPackages (p:
+        with p; [
+          pycryptodome
+          cryptography
+          gmpy2
+          sympy
+          z3-solver
+          numpy
+          scipy
+          pwntools
+          tqdm
+          ipython
+        ]);
     in {
       default = pkgs.mkShell {
         packages = with pkgs; [
-          # Password / Hash cracking & SSL tooling
           openssl
           hashcat
           john
-
-          # Python Cryptanalysis & Math stack
-          (python3.withPackages (ps: [
-            ps.pycryptodome
-            ps.cryptography
-            ps.gmpy2
-            ps.sympy
-            ps.z3-solver
-            ps.pwntools
-            ps.requests
-          ]))
+          z3
+          pythonEnv
         ];
 
         shellHook = ''

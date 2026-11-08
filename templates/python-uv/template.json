@@ -1,0 +1,11 @@
+{
+  "name": "python-uv",
+  "aliases": [
+    "py",
+    "python",
+    "uv"
+  ],
+  "description": "Python project with uv, ruff, pyright, and nix-ld dynamic library support",
+  "category": "Systems & General Purpose",
+  "run": "uv run main.py"
+}

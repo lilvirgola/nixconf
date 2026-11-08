@@ -1,36 +1,32 @@
-# `nixos/features/` — Composable NixOS Feature Modules
+# Feature modules in nixos/features/
 
-Every file under `nixos/features/` defines one or more reusable NixOS modules exposed under `flake.nixosModules.<name>`.
+Files under `nixos/features/` define reusable NixOS modules exposed under `flake.nixosModules.<name>`.
 
-Features are the modular building blocks of your operating system. Rather than creating a single monolithic configuration, each feature encapsulates a discrete capability: its packages, services, daemon configurations, udev rules, environment variables, and PAM hooks.
+Each feature groups related packages, services, udev rules, environment variables, and user permissions for a specific capability.
 
----
-
-## Directory Organization
+## Directory organization
 
 ```text
 nixos/features/
-├── system/                    # Core OS plumbing, hardware, display, and session services
-│   ├── base.nix               # User virgola, nix-ld, fonts, weekly GC & deduplication
+├── system/                    # OS plumbing, hardware, display, and session services
+│   ├── base.nix               # User virgola, nix-ld, fonts, weekly GC, and deduplication
 │   ├── mangowm.nix            # MangoWM session, SDDM login, autostart daemons, keybindings
-│   ├── noctalia.nix           # Noctalia v5 shell & floating bar integration
+│   ├── noctalia.nix           # Noctalia v5 shell
 │   ├── niri.nix               # Niri scrollable tiling compositor fallback
-│   ├── wireguard.nix          # WireGuard & Fortinet SSL VPN suite (openfortivpn)
+│   ├── wireguard.nix          # WireGuard and Fortinet SSL VPN suite (openfortivpn)
 │   ├── laptop.nix             # UPower, power-profiles-daemon, lid switch, Blueman
-│   ├── nvidia.nix             # Proprietary Nvidia drivers & PRIME offload
-│   └── zsh.nix                # Zsh shell, Starship, power aliases & vault scripts
-└── apps/                      # User-facing application suites & developer toolchains
+│   ├── nvidia.nix             # Nvidia drivers and PRIME offload
+│   └── zsh.nix                # Zsh shell, Starship prompt, aliases, vault scripts
+└── apps/                      # Application suites and developer stacks
     ├── dev.nix                # Python (uv, pip), PHP, JDK 21, VS Code, Docker, LaTeX/LuaTeX
-    ├── security.nix           # Pwn, Web, Reversing, Crypto, Stego (Ghidra, Pwndbg, Sage, MTP)
-    ├── desktop.nix            # Daily desktop tools (Firefox, Thunar, GIMP, VLC, Vesktop, Zathura)
+    ├── security.nix           # Pwn, web, reversing, crypto, stego (Ghidra, Pwndbg, Sage, MTP)
+    ├── desktop.nix            # Desktop tools (Firefox, Thunar, GIMP, VLC, Vesktop, Zathura)
     └── gaming.nix             # Steam, GameMode, Proton-GE optimizations
 ```
 
----
+## Module structure
 
-## Anatomy of a Feature Module
-
-Every feature follows this standard template:
+Features use this structure:
 
 ```nix
 {
@@ -44,25 +40,23 @@ Every feature follows this standard template:
     pkgs,
     ...
   }: {
-    # 1. System packages needed for this feature:
+    # System packages:
     environment.systemPackages = with pkgs; [
       myPackage
     ];
 
-    # 2. System services:
+    # Services:
     services.myService.enable = true;
 
-    # 3. Security, firewall, or user permissions:
+    # Firewall or user permissions:
     # networking.firewall.allowedTCPPorts = [ ... ];
     # users.users.virgola.extraGroups = [ "mygroup" ];
   };
 }
 ```
 
----
+## Guidelines for feature modules
 
-## Best Practices for Authoring Features
-
-1. **Keep Features Decoupled**: Never assume a feature will only run on a specific host. A feature should function identically whether imported by a VM, a desktop workstation, or a laptop.
-2. **Use `lib.mkDefault`**: When defining default settings that a specific machine might want to override (e.g. `services.openssh.enable`), wrap the value in `lib.mkDefault` so hosts can override it cleanly without `mkForce`.
-3. **Automatic Discovery**: Because of the Dendritic auto-import pattern in `flake.nix`, simply creating a `.nix` file in `nixos/features/` registers its module globally in `self.nixosModules.<name>`.
+1. Keep features hardware independent: a feature should work across virtual machines, workstations, and laptops without assumptions about the target machine.
+2. Use `lib.mkDefault`: wrap defaults in `lib.mkDefault` so individual hosts can override settings without needing `lib.mkForce`.
+3. Flake discovery: any `.nix` file placed in `nixos/features/` is registered under `self.nixosModules.<name>` by `flake.nix`.

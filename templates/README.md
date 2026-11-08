@@ -1,84 +1,88 @@
-# `templates/` — Project DevShell Templates
+# Project devShell templates in templates/
 
-This directory houses reproducible, zero-friction project templates exposed via `flake.templates.<name>` and consumable with the automated `ninit` CLI tool or `nix flake init -t`.
+This directory contains project templates exposed through `flake.templates.<name>` and used by `ninit` or `nix flake init -t`.
 
----
+## Starting a project
 
-## Three Ways to Start a Project on NixOS
+### Automated scaffolding with ninit
 
-### Method 1: Automated Scaffold (`ninit`) — Recommended!
-
-The fastest, recommended method to bootstrap a new repository:
+Run `ninit` to select a template interactively or pass the template name directly:
 
 ```bash
-# 1. Interactive picker with fzf:
+# Interactive picker:
 ninit
 
-# 2. Or specify template and project name directly:
+# Direct template initialization:
 ninit rust my-crate          # Scaffolds Rust template in ./my-crate
 ninit rust-gui my-gpui-app   # Scaffolds Rust GUI (GPUI, Bevy, Egui) in ./my-gpui-app
-ninit zig my-zig-app         # Scaffolds Zig & ZLS template in ./my-zig-app
-ninit typst my-doc           # Scaffolds Typst & Tinymist template in ./my-doc
+ninit zig my-zig-app         # Scaffolds Zig and ZLS template in ./my-zig-app
+ninit typst my-doc           # Scaffolds Typst and Tinymist template in ./my-doc
 ninit py my-fastapi          # Scaffolds Python uv template in ./my-fastapi
 ninit go my-microservice     # Scaffolds Go template in ./my-microservice
 ninit bun my-bun-app         # Scaffolds Bun JS/TS template in ./my-bun-app
-ninit ts my-frontend         # Scaffolds TypeScript & Node 22 template in ./my-frontend
+ninit ts my-frontend         # Scaffolds TypeScript and Node 22 template in ./my-frontend
 ninit latex my-thesis        # Scaffolds LaTeX/LuaTeX template in ./my-thesis
-ninit cpp my-engine          # Scaffolds Modern C/C++ template in ./my-engine
-ninit pio my-firmware        # Scaffolds Embedded & PlatformIO template in ./my-firmware
-ninit php my-api             # Scaffolds PHP & Composer template in ./my-api
-ninit shell my-script        # Scaffolds Shellcheck & shfmt template in ./my-script
-ninit java my-java-app       # Scaffolds Java & Gradle/Maven template in ./my-java-app
-ninit cs my-dotnet-app       # Scaffolds C# & .NET 9 template in ./my-dotnet-app
-ninit elixir my-elixir-app   # Scaffolds Elixir & Erlang template in ./my-elixir-app
-ninit haskell my-haskell     # Scaffolds Haskell & HLS template in ./my-haskell
-ninit nix my-flake           # Scaffolds Nix packaging & LSP template in ./my-flake
-ninit pwn my-pwn-ctf         # Scaffolds Binary Exploitation template in ./my-pwn-ctf
-ninit rev my-reversing-lab   # Scaffolds Reverse Engineering template in ./my-reversing-lab
-ninit ctf-web my-web-ctf     # Scaffolds CTF Web Exploitation template in ./my-web-ctf
-ninit crypto my-crypto-ctf   # Scaffolds CTF Cryptography template in ./my-crypto-ctf
-ninit net my-pcap-lab        # Scaffolds CTF Network / PCAP template in ./my-pcap-lab
+ninit cpp my-engine          # Scaffolds C/C++ template in ./my-engine
+ninit pio my-firmware        # Scaffolds embedded PlatformIO template in ./my-firmware
+ninit php my-api             # Scaffolds PHP and Composer template in ./my-api
+ninit shell my-script        # Scaffolds shell scripting template in ./my-script
+ninit java my-java-app       # Scaffolds Java template in ./my-java-app
+ninit cs my-dotnet-app       # Scaffolds C# and .NET 9 template in ./my-dotnet-app
+ninit elixir my-elixir-app   # Scaffolds Elixir and Erlang template in ./my-elixir-app
+ninit haskell my-haskell     # Scaffolds Haskell and HLS template in ./my-haskell
+ninit nix my-flake           # Scaffolds Nix packaging template in ./my-flake
+ninit ctf-base my-base-ctf   # Scaffolds CTF base and forensics template in ./my-base-ctf
+ninit ctf-pwn my-pwn-ctf     # Scaffolds CTF binary exploitation template in ./my-pwn-ctf
+ninit ctf-rev my-rev-ctf     # Scaffolds CTF reverse engineering template in ./my-rev-ctf
+ninit ctf-crypto my-crypto   # Scaffolds CTF cryptography template in ./my-crypto
+ninit ctf-web my-web-ctf     # Scaffolds CTF web exploitation template in ./my-web-ctf
+ninit ctf-osint my-osint-lab # Scaffolds CTF OSINT and recon template in ./my-osint-lab
+ninit ctf-network my-pcap    # Scaffolds CTF network and PCAP template in ./my-pcap
+ninit ctf-full my-all-in-one # Scaffolds full CTF workspace in ./my-all-in-one
 ```
 
-`ninit` handles all boilerplate automatically:
+`ninit` handles initialization steps:
 1. Creates the target directory.
-2. Copies all template files (`flake.nix`, `.envrc`, starter code, and config files).
-3. Initializes a Git repository with `git init`.
-4. Runs `direnv allow` so the isolated `devShell` activates instantly.
+2. Copies template files (`flake.nix`, `.envrc`, starter code, and configs).
+3. Initializes a Git repository if one does not exist.
+4. Adds `.direnv/`, `result`, and `result-*` to `.gitignore`.
+5. Stages files with `git add -A`.
+6. Runs `direnv allow` to activate the devShell.
 
----
+## Available templates
 
-## Available Templates (23 Total)
+### Systems and general purpose
+- `rust`: Cargo, rustc, rust-analyzer, clippy, rustfmt, OpenSSL, starter `Cargo.toml` and `src/main.rs`.
+- `rust-gui`: Rust GUI and game development (GPUI, Bevy, Egui, Winit) configured with Wayland, Vulkan, libxkbcommon, Fontconfig, and `LD_LIBRARY_PATH`.
+- `zig`: Zig compiler, `zls` language server, GDB, starter `build.zig` and `src/main.zig`.
+- `c-cpp`: Clang, GCC, CMake, Ninja, GDB, Valgrind, `clang-tools` (clangd, clang-format).
+- `go`: Go, `gopls` language server, `golangci-lint`, `delve` debugger, starter `go.mod` and `main.go`.
+- `python-uv`: Python, `uv`, `ruff`, `pyright`, `nix-ld` compatibility, starter `pyproject.toml` and `main.py`.
+- `embedded`: PlatformIO Core (`pio`), ARM Embedded GCC, TinyGo, Avrdude, OpenOCD.
 
-### Systems & General Purpose
-1. **`rust`**: Cargo, rustc, rust-analyzer, clippy, rustfmt, OpenSSL, starter `Cargo.toml` and `src/main.rs`.
-2. **`rust-gui`**: Rust GUI/Game dev (GPUI, Bevy, Egui, Winit) preconfigured with Wayland, Vulkan, libxkbcommon, Fontconfig, and `LD_LIBRARY_PATH`.
-3. **`zig`**: Zig compiler, `zls` language server, GDB, starter `build.zig` and `src/main.zig`.
-4. **`c-cpp`**: Clang, GCC, CMake, Ninja, GDB, Valgrind, `clang-tools` (clangd, clang-format).
-5. **`go`**: Go, `gopls` language server, `golangci-lint`, `delve` debugger, starter `go.mod` and `main.go`.
-6. **`python-uv`**: Python, `uv`, `ruff`, `pyright`, `nix-ld` compatibility, starter `pyproject.toml` and `main.py`.
-7. **`embedded`**: PlatformIO Core (`pio`), ARM Embedded GCC, TinyGo, Avrdude, OpenOCD.
+### Web, scripting, and runtimes
+- `typescript`: Node.js 22 LTS, `pnpm`, `typescript`, `biome` linter and formatter, `package.json`, `tsconfig.json`.
+- `bun`: Bun runtime, package manager, test runner, starter `package.json` and `index.ts`.
+- `php`: PHP CLI, Composer, PSR-4 autoloading starter `composer.json` and `public/index.php`.
+- `shell`: Bash and POSIX shell scripting with `shellcheck` and `shfmt`.
 
-### Web, Scripting & Runtimes
-8. **`typescript`**: Node.js 22 LTS, `pnpm`, `typescript`, `biome` linter/formatter, `package.json`, `tsconfig.json`.
-9. **`bun`**: Bun ultra-fast runtime, package manager, test runner, starter `package.json` and `index.ts`.
-10. **`php`**: PHP CLI, Composer, PSR-4 autoloading starter `composer.json` and `public/index.php`.
-11. **`shell`**: Bash & POSIX shell scripting with `shellcheck` linter and `shfmt` formatter.
+### Document and typesetting
+- `typst`: Document typesetting with `typst`, `typstyle` formatter, and `tinymist` LSP.
+- `latex`: TeX Live Full, LuaTeX, `tectonic`, `texlab` LSP, `zathura` viewer with SyncTeX.
 
-### Document & Typesetting
-12. **`typst`**: Modern document typesetting with `typst`, `typstyle` formatter, and `tinymist` LSP.
-13. **`latex`**: TeX Live Full, LuaTeX, `tectonic`, `texlab` LSP, `zathura` viewer with bidirectional SyncTeX.
+### Enterprise and functional languages
+- `java`: OpenJDK 21, Gradle, Maven, configured `JAVA_HOME`.
+- `csharp`: .NET 9 SDK, `omnisharp-roslyn`, configured `DOTNET_ROOT` and starter `.csproj`.
+- `elixir`: Elixir, Erlang/OTP, `rebar3`.
+- `haskell`: GHC, Cabal, Haskell Language Server (`haskell-language-server`).
+- `nix`: Nix flake development with `nixd` LSP, `statix`, `deadnix`, and `alejandra` formatter.
 
-### Enterprise & Functional Languages
-14. **`java`**: OpenJDK 21, Gradle, Maven, preconfigured `JAVA_HOME`.
-15. **`csharp`**: .NET 9 SDK, `omnisharp-roslyn`, preconfigured `DOTNET_ROOT` and starter `.csproj`.
-16. **`elixir`**: Elixir, Erlang/OTP, `rebar3`.
-17. **`haskell`**: GHC, Cabal, Haskell Language Server (`haskell-language-server`).
-18. **`nix`**: Nix flake development with `nixd` LSP, `statix` linter, `deadnix`, and `alejandra` formatter.
-
-### Security, CTF & Reverse Engineering (Personalized)
-19. **`pwn`**: Binary exploitation with Python `pwntools`, `pycryptodome`, `ropper`, `ropgadget`, `one_gadget`, `gdb`, `checksec`, `patchelf`, `socat`.
-20. **`reversing`**: Reverse engineering & binary analysis with `radare2`, `rizin`, `ghidra-bin`, `hexyl`, `binwalk`, `capstone`, `unicorn`, `pefile`.
-21. **`ctf-web`**: Web penetration testing & CTF with `ffuf`, `sqlmap`, `mitmproxy`, `socat`, `requests`, `httpx`, `beautifulsoup4`.
-22. **`ctf-crypto`**: Cryptanalysis & mathematical CTF with `gmpy2`, `sympy`, `z3-solver`, `pycryptodome`, `cryptography`, `hashcat`, and `john`.
-23. **`ctf-network`**: Network packet & PCAP forensics with `wireshark-cli` (`tshark`), `termshark`, `tcpdump`, `scapy`, `pyshark`, and `dpkt`.
+### Security and CTF suite
+- `ctf-base`: CTF foundation with `gdb`, `strace`, `ltrace`, `binwalk`, `exiftool`, `nasm`, `patchelf`, `socat`, `netcat`, and `pwntools`.
+- `ctf-pwn`: Binary exploitation with `gdb`, `gef`, `checksec`, `patchelf`, `one_gadget`, `ropgadget`, `pwninit`, `qemu-user`, `socat`, `pwntools`, `angr`, `keystone-engine`, `scapy`, and `z3-solver`.
+- `ctf-rev`: Reverse engineering and binary analysis with `ghidra-bin`, `rizin`, `radare2`, `jadx`, `apktool`, `binwalk`, `hexyl`, `capstone`, `unicorn`, `angr`, `lief`, and `z3-solver`.
+- `ctf-crypto`: Cryptography with `hashcat`, `john`, `z3`, `openssl`, `gmpy2`, `sympy`, `z3-solver`, `numpy`, and `pycryptodome`.
+- `ctf-web`: Web penetration testing with `ffuf`, `gobuster`, `sqlmap`, `nikto`, `mitmproxy`, `nmap`, `requests`, `httpx`, and `beautifulsoup4`.
+- `ctf-osint`: OSINT and reconnaissance with `sherlock`, `theHarvester`, `holehe`, `socialscan`, `maigret`, `exiftool`, and `volatility3`.
+- `ctf-network`: Network packet and PCAP analysis with `wireshark-cli` (`tshark`), `termshark`, `tcpdump`, `nmap`, `scapy`, `pyshark`, and `dpkt`.
+- `ctf-full`: CTF environment combining tools from base, pwn, rev, crypto, web, osint, and network.

@@ -1,0 +1,11 @@
+{
+  "name": "ctf-osint",
+  "aliases": [
+    "osint",
+    "recon",
+    "forensics"
+  ],
+  "description": "CTF OSINT and reconnaissance with sherlock, theHarvester, holehe, and volatility3",
+  "category": "Security & CTF",
+  "run": "python3 investigate.py"
+}

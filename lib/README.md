@@ -1,48 +1,36 @@
-# `lib/` — Flake Infrastructure, Formatting & Checks
+# Flake infrastructure in lib/
 
-This directory contains **flake-wide infrastructure, `flake-parts` modules, formatters, automated checks, and template registrations** that apply across the entire repository.
+This directory contains flake-wide modules, formatters, automated checks, and template exports for the repository.
 
----
+## Modules
 
-## Current Modules
+### parts.nix ([lib/parts.nix](./parts.nix))
+Declares the target platforms evaluated by `perSystem`:
+```nix
+systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+```
 
-### 1. `parts.nix` ([`lib/parts.nix`](./parts.nix))
-- Declares the target platform architectures evaluated by `perSystem`:
-  ```nix
-  systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-  ```
-- Ensures multi-architecture support across all defined packages, devShells, and checks.
+### fmt.nix ([lib/fmt.nix](./fmt.nix))
+Configures `pkgs.alejandra` as the formatter for `nix fmt .`, and adds `checks.nix-fmt` so running `nix flake check .` verifies formatting in CI.
 
-### 2. `fmt.nix` ([`lib/fmt.nix`](./fmt.nix))
-- **Formatter**: Configures `pkgs.alejandra` as the flake-wide formatter executed by `nix fmt .`.
-- **Automated Check**: Registers `checks.nix-fmt` so running `nix flake check .` or CI automatically enforces Alejandra formatting rules across all `.nix` files.
+### templates.nix ([lib/templates.nix](./templates.nix))
+Exports `flake.templates` pointing to the directories in `templates/`, providing 26 environments across systems development, web runtimes, document typesetting, enterprise languages, and security/CTF categories.
 
-### 3. `templates.nix` ([`lib/templates.nix`](./templates.nix))
-- Exposes `flake.templates` pointing to the definitions in `templates/`:
-  - `python-uv`: Modern Python 3 with `uv`, `ruff`, and `.envrc`.
-  - `go`: Go module with language server, linter, and debugger.
-  - `rust`: Rust crate with Cargo toolchain and rust-analyzer.
-  - `latex`: Complete academic publishing setup with Tectonic, SyncTeX, and Texlab.
-
----
-
-## Flake Validation Commands
+## Validation commands
 
 ```bash
-# 1. Format all Nix files according to Alejandra standard:
+# Format all Nix files with Alejandra:
 nix fmt .
 
-# 2. Run all flake checks (formatting, derivations, evaluation):
+# Run flake checks (formatting, derivations, evaluation):
 nix flake check .
 
-# 3. Test compatibility with specific Nixpkgs revisions:
+# Test against a specific Nixpkgs revision:
 nix flake check --override-input nixpkgs github:nixos/nixpkgs/nixos-unstable
 ```
 
----
+## The underscore prefix convention
 
-## The `_` Prefix Convention
+`flake.nix` discovers and imports every `.nix` file in the tree. Any file in this directory must be a valid module returning an attribute set.
 
-Because `flake.nix` automatically discovers and imports every `.nix` file in the repository tree, any file you add here is expected to be a valid `flake-parts` module (a function accepting `{ inputs, self, ... }` and returning an attribute set).
-
-If you want to write a raw Nix expression or helper function to import manually (rather than a module), simply prefix the file name with `_` (e.g. `_helpers.nix`). The importer in `flake.nix` will ignore it.
+To define helper functions or raw expressions meant for manual import, prefix the filename with an underscore (such as `_helpers.nix`). The discovery logic skips files starting with `_`.

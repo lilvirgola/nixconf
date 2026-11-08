@@ -1,0 +1,11 @@
+{
+  "name": "ctf-full",
+  "aliases": [
+    "full",
+    "all",
+    "ctf"
+  ],
+  "description": "All-in-one CTF workspace with pwn, rev, crypto, web, osint, and network tools",
+  "category": "Security & CTF",
+  "run": "python3 solve.py"
+}
