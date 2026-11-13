@@ -117,6 +117,7 @@
       # Files, PDFs, Graphics & Screenshots
       gimp
       inkscape
+      blender
       yazi
       zathura
       poppler-utils
