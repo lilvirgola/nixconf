@@ -4,7 +4,37 @@
     pkgs,
     lib,
     ...
-  }: {
+  }:
+  let
+    blenderWithCuda =
+      let
+        cudaToolkit = pkgs.symlinkJoin {
+          name = "blender-cuda-env";
+          paths = [
+            pkgs.cudaPackages.cuda_nvcc
+            pkgs.cudaPackages.cuda_cudart
+            pkgs.cudaPackages.cuda_crt
+            pkgs.cudaPackages.cccl
+          ];
+        };
+      in
+      pkgs.symlinkJoin {
+        name = "blender";
+        paths = [ pkgs.blender ];
+        buildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          rm $out/bin/blender
+          makeWrapper ${pkgs.blender}/bin/blender $out/bin/blender \
+            --prefix PATH : "${lib.makeBinPath [ cudaToolkit ]}" \
+            --prefix CPATH : "${cudaToolkit}/include" \
+            --set CUDA_PATH "${cudaToolkit}" \
+            --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib" \
+            --set-default __NV_PRIME_RENDER_OFFLOAD 1 \
+            --set-default __GLX_VENDOR_LIBRARY_NAME nvidia \
+            --set-default __VK_LAYER_NV_optimus NVIDIA_only
+        '';
+      };
+  in {
     programs.firefox.enable = true;
 
     # Global GTK & Dconf Theme Integration (driven by centralized custom.theme settings)
@@ -117,7 +147,7 @@
       # Files, PDFs, Graphics & Screenshots
       gimp
       inkscape
-      blender
+      blenderWithCuda
       yazi
       zathura
       poppler-utils
