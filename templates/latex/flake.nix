@@ -18,13 +18,12 @@
             ps.biber
             ps.chktex
           ]))
-          tectonic
           texlab
           zathura
         ];
 
         shellHook = ''
-          echo "LaTeX devShell active (LuaTeX, TeX Live Full, Tectonic, Texlab)"
+          echo "LaTeX devShell active (LuaTeX, TeX Live, Texlab, Zathura)"
         '';
       };
     });

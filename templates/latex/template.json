@@ -3,7 +3,7 @@
   "aliases": [
     "tex"
   ],
-  "description": "LaTeX project with LuaTeX, TeX Live Full, tectonic, texlab, and zathura",
+  "description": "LaTeX project with LuaTeX, TeX Live, texlab, and zathura",
   "category": "Document & Typesetting",
-  "run": "tectonic main.tex"
+  "run": "latexmk -pdf main.tex"
 }

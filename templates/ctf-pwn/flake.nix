@@ -41,7 +41,9 @@
           strace
           ropgadget
           one_gadget
-          pwninit
+          (pwninit.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or []) ++ [zstd];
+          }))
           checksec
           patchelf
           nasm

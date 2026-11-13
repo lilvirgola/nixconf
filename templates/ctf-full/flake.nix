@@ -44,7 +44,9 @@
           ltrace
           ropgadget
           one_gadget
-          pwninit
+          (pwninit.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or []) ++ [zstd];
+          }))
           qemu-user
 
           # Reverse Engineering (rev)

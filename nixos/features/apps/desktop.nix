@@ -92,7 +92,7 @@
       papirus-icon-theme
       bibata-cursors
       # Web Browsers
-      brave
+      librewolf
 
       # Music & Media
       spotify

@@ -68,7 +68,7 @@ ninit ctf-full my-all-in-one # Scaffolds full CTF workspace in ./my-all-in-one
 
 ### Document and typesetting
 - `typst`: Document typesetting with `typst`, `typstyle` formatter, and `tinymist` LSP.
-- `latex`: TeX Live Full, LuaTeX, `tectonic`, `texlab` LSP, `zathura` viewer with SyncTeX.
+- `latex`: TeX Live, LuaTeX, `texlab` LSP, `zathura` viewer with SyncTeX.
 
 ### Enterprise and functional languages
 - `java`: OpenJDK 21, Gradle, Maven, configured `JAVA_HOME`.

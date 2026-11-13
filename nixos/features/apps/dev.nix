@@ -86,7 +86,6 @@
         ps.biber
         ps.chktex
       ]))
-      tectonic
       texlab
       ltex-ls-plus
 

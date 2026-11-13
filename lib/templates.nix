@@ -26,7 +26,7 @@
     };
     latex = {
       path = ../templates/latex;
-      description = "LaTeX and LuaTeX project with TeX Live Full, tectonic, texlab, and zathura";
+      description = "LaTeX and LuaTeX project with TeX Live, texlab, and zathura";
     };
     typescript = {
       path = ../templates/typescript;

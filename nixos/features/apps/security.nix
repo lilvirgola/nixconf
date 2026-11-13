@@ -16,6 +16,14 @@
       builtins.replaceStrings ["@templatePath@"] ["${../../../assets/pwn/pwninit-template.py}"] (builtins.readFile ../../../assets/pwn/pwninit-ghidra.sh)
     );
   in {
+    nixpkgs.overlays = [
+      (final: prev: {
+        pwninit = prev.pwninit.overrideAttrs (old: {
+          buildInputs = (old.buildInputs or []) ++ [final.zstd];
+        });
+      })
+    ];
+
     # Enables Wireshark with dumpcap permissions for users in the "wireshark" group
     programs.wireshark = {
       enable = true;

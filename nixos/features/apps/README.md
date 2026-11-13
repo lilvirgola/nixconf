@@ -17,7 +17,7 @@ Development toolchains, container engines, and document tools:
 
 ### LaTeX and academic publishing
 - TeX Live: `texliveMedium` bundled with `biber` and `chktex`.
-- Compilers and language servers: `tectonic`, `texlab`, and `ltex-ls-plus`.
+- Compilers and language servers: `texlab` and `ltex-ls-plus`.
 - SyncTeX: configured between Zathura and editors with `Ctrl+Click` navigation from PDF to LaTeX source.
 
 ### Containers and editors
