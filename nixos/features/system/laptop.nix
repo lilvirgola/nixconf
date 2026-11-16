@@ -42,8 +42,6 @@
       HandleLidSwitch = "suspend";
       HandleLidSwitchDocked = "ignore";
     };
-    services.upower.enable = true;
-    services.power-profiles-daemon.enable = true;
 
     environment.systemPackages = with pkgs; [
       brightnessctl

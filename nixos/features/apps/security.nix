@@ -3,7 +3,11 @@
   inputs,
   ...
 }: {
-  flake.nixosModules.security = {pkgs, ...}: let
+  flake.nixosModules.security = {
+    config,
+    pkgs,
+    ...
+  }: let
     ghidraAuto =
       pkgs.writers.writePython3Bin "ghidra-auto" {
         libraries = with pkgs.python3Packages; [click];
@@ -16,6 +20,8 @@
       builtins.replaceStrings ["@templatePath@"] ["${../../../assets/pwn/pwninit-template.py}"] (builtins.readFile ../../../assets/pwn/pwninit-ghidra.sh)
     );
   in {
+    users.users.${config.custom.username}.extraGroups = ["wireshark"];
+
     nixpkgs.overlays = [
       (final: prev: {
         pwninit = prev.pwninit.overrideAttrs (old: {

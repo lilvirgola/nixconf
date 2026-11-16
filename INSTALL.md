@@ -15,6 +15,37 @@ This guide walks you through a clean, from-scratch installation of **Virgola's N
 
 ---
 
+## Quick paths: custom ISO, disko, and Raspberry Pi 4
+
+### Build and boot the custom rescue ISO (`x86_64-linux`)
+
+```bash
+nix build .#iso
+sudo dd if=result/iso/*.iso of=/dev/sdX bs=4M status=progress oflag=sync
+```
+
+### Automated partitioning and install with `disko`
+
+Hosts with `_disko.nix` (`laptop`, `desktop`, `server`, `vm`, `vm-minimal`) can be partitioned, formatted, mounted, and installed in one pass from the live ISO:
+
+```bash
+git clone https://github.com/lilvirgola/nixconf.git /tmp/nixconf
+cd /tmp/nixconf
+./bootstrap.sh --host server --disko
+```
+
+> [!CAUTION]
+> `--disko` runs `disko --mode destroy,format,mount`, which wipes the target disk defined in `nixos/hosts/<host>/_disko.nix`. Verify the device path before confirming.
+
+### Flash a Raspberry Pi 4 SD card (`aarch64-linux`)
+
+```bash
+nix build .#packages.aarch64-linux.raspberrypi-sd
+zstdcat result/sd-image/*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress oflag=sync
+```
+
+---
+
 ## 1. Pre-Installation Checklist
 
 - [x] **Data Backup**: Ensure your files, personal repositories, SSH keys (`~/.ssh`), and browser profiles are backed up to external storage (e.g. USB drive or external hard drive).

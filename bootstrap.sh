@@ -36,8 +36,9 @@ usage() {
   echo "Usage: $0 [OPTIONS]"
   echo ""
   echo "Options:"
-  echo "  -h, --host HOSTNAME   Target host configuration (default: laptop, options: laptop, vm)"
+  echo "  -h, --host HOSTNAME   Target host (default: laptop; options: laptop, desktop, vm, vm-minimal, server, raspberrypi)"
   echo "  -d, --dir PATH        Path to nixconf repository (default: current directory or ~/nixconf)"
+  echo "  --disko               Format & mount disk using host's _disko.nix before install (DESTRUCTIVE)"
   echo "  --no-hardware         Skip generating hardware.nix"
   echo "  --no-password         Skip password setup prompt"
   echo "  --dry-run             Evaluate configuration without rebuilding system"
@@ -48,6 +49,7 @@ usage() {
 # Defaults
 TARGET_HOST="laptop"
 REPO_DIR=""
+USE_DISKO=false
 GEN_HARDWARE=true
 SET_PASSWORD=true
 DRY_RUN=false
@@ -62,6 +64,10 @@ while [[ $# -gt 0 ]]; do
     -d|--dir)
       REPO_DIR="$2"
       shift 2
+      ;;
+    --disko)
+      USE_DISKO=true
+      shift
       ;;
     --no-hardware)
       GEN_HARDWARE=false
@@ -155,17 +161,21 @@ fi
 if [ "$TARGET_HOST" = "laptop" ] && [ -t 0 ]; then
   echo ""
   info "Available host configurations:"
-  echo "  1) laptop  - Physical Laptop (UEFI, Nvidia hybrid, Power/Bluetooth, SSH disabled)"
-  echo "  2) vm      - Virtual Machine (GRUB, QEMU/SPICE, SSH enabled)"
-  ask "Select target host [1 for laptop / 2 for vm] (default: 1): "
+  echo "  1) laptop       - Physical Laptop (UEFI, Nvidia hybrid, MangoWM, Gaming, Security)"
+  echo "  2) desktop      - Physical Workstation (UEFI, disko Btrfs, MangoWM, Dev, Gaming)"
+  echo "  3) vm           - Graphical VM (GRUB, QEMU/SPICE, MangoWM, Dev, Security)"
+  echo "  4) vm-minimal   - Minimal Headless VM (GRUB, QEMU guest, Core CLI)"
+  echo "  5) server       - Headless Server / Homelab (UEFI, disko Btrfs, Docker, Tailscale)"
+  echo "  6) raspberrypi  - Raspberry Pi 4 (aarch64-linux, Tailscale, Docker)"
+  ask "Select target host [1-6] (default: 1): "
   read -r host_choice
   case "$host_choice" in
-    2|vm)
-      TARGET_HOST="vm"
-      ;;
-    *)
-      TARGET_HOST="laptop"
-      ;;
+    2|desktop)     TARGET_HOST="desktop" ;;
+    3|vm)          TARGET_HOST="vm" ;;
+    4|vm-minimal)  TARGET_HOST="vm-minimal" ;;
+    5|server)      TARGET_HOST="server" ;;
+    6|raspberrypi) TARGET_HOST="raspberrypi" ;;
+    *)             TARGET_HOST="laptop" ;;
   esac
 fi
 success "Selected target host: ${BOLD}$TARGET_HOST${NC}"
@@ -175,6 +185,25 @@ HOST_DIR="$REPO_DIR/nixos/hosts/$TARGET_HOST"
 if [ ! -d "$HOST_DIR" ]; then
   error "Host directory $HOST_DIR does not exist!"
   exit 1
+fi
+
+# 2b. Optional disko provisioning (destructive)
+if [ "$USE_DISKO" = true ]; then
+  if [ ! -f "$HOST_DIR/_disko.nix" ]; then
+    error "No _disko.nix found at $HOST_DIR/_disko.nix!"
+    exit 1
+  fi
+  warn "Disko will DESTROY and REFORMAT the target disk defined in $HOST_DIR/_disko.nix."
+  ask "Type 'YES' to proceed with disko partitioning/formatting: "
+  read -r disko_confirm
+  if [ "$disko_confirm" != "YES" ]; then
+    error "Disko aborted by user."
+    exit 1
+  fi
+  sudo nix --extra-experimental-features "nix-command flakes" run github:nix-community/disko -- \
+    --mode destroy,format,mount "$HOST_DIR/_disko.nix"
+  success "Disko partitioning and mount complete!"
+  GEN_HARDWARE=false
 fi
 
 # 3. Generate hardware configuration

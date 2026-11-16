@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+staged_nix=$(git diff --cached --name-only --diff-filter=ACM -- '*.nix' || true)
+[ -z "$staged_nix" ] && exit 0
+
+if command -v alejandra >/dev/null 2>&1; then
+  echo "$staged_nix" | xargs -r alejandra --quiet
+  echo "$staged_nix" | xargs -r git add
+fi
+
+if command -v statix >/dev/null 2>&1; then
+  echo "$staged_nix" | xargs -r -n1 statix check -c statix.toml
+fi
+
+if command -v deadnix >/dev/null 2>&1; then
+  echo "$staged_nix" | xargs -r deadnix --fail
+fi
+

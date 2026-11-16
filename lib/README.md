@@ -1,36 +1,18 @@
-# Flake infrastructure in lib/
+# Flake infrastructure (`lib/`)
 
-This directory contains flake-wide modules, formatters, automated checks, and template exports for the repository.
+Shared `flake-parts` configuration for the repository.
 
 ## Modules
 
-### parts.nix ([lib/parts.nix](./parts.nix))
-Declares the target platforms evaluated by `perSystem`:
-```nix
-systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-```
+- `parts.nix`: Sets `systems` to `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, and `aarch64-darwin`, and enables `allowUnfree = true` for `perSystem` packages.
+- `fmt.nix`: Configures `alejandra` (`nix fmt .`), `checks.nix-fmt`, `checks.nix-lint` (`statix` + `deadnix`), and `devShells.default` (which sets `git config core.hooksPath .githooks`).
+- `templates.nix`: Exports `flake.templates` from `templates/`.
 
-### fmt.nix ([lib/fmt.nix](./fmt.nix))
-Configures `pkgs.alejandra` as the formatter for `nix fmt .`, and adds `checks.nix-fmt` so running `nix flake check .` verifies formatting in CI.
-
-### templates.nix ([lib/templates.nix](./templates.nix))
-Exports `flake.templates` pointing to the directories in `templates/`, providing 26 environments across systems development, web runtimes, document typesetting, enterprise languages, and security/CTF categories.
-
-## Validation commands
+## Validation
 
 ```bash
-# Format all Nix files with Alejandra:
 nix fmt .
-
-# Run flake checks (formatting, derivations, evaluation):
-nix flake check .
-
-# Test against a specific Nixpkgs revision:
-nix flake check --override-input nixpkgs github:nixos/nixpkgs/nixos-unstable
+nix flake check
 ```
 
-## The underscore prefix convention
-
-`flake.nix` discovers and imports every `.nix` file in the tree. Any file in this directory must be a valid module returning an attribute set.
-
-To define helper functions or raw expressions meant for manual import, prefix the filename with an underscore (such as `_helpers.nix`). The discovery logic skips files starting with `_`.
+Files prefixed with `_` are ignored by the recursive module loader in `flake.nix` and can be imported manually.

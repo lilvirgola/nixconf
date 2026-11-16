@@ -11,7 +11,8 @@
   }: {
     imports = [
       self.nixosModules.vmHardware
-      self.nixosModules.base
+      self.nixosModules.core
+      self.nixosModules.desktop
       self.nixosModules.mangowm
       self.nixosModules.wireguard
       self.nixosModules.desktopApps
@@ -21,6 +22,8 @@
     ];
 
     services.vscode-server.enable = true;
+    services.qemuGuest.enable = true;
+    services.spice-vdagentd.enable = true;
 
     # Bootloader.
     boot.loader.grub.enable = true;
@@ -31,7 +34,7 @@
     # Use latest kernel.
     boot.kernelPackages = pkgs.linuxPackages_latest;
 
-    networking.hostName = "nixos";
+    networking.hostName = "vm";
 
     # Ensure password works in the VM even if nixos.qcow2 already exists
     users.users.${config.custom.username} = {
