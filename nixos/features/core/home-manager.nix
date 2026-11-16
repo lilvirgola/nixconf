@@ -11,7 +11,7 @@
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      backupFileExtension = "bak";
+      backupFileExtension = "hm-bak";
 
       users.${config.custom.username} = {
         imports = [
