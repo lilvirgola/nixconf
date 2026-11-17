@@ -2,12 +2,18 @@
   flake.nixosModules.laptopConfiguration = {pkgs, ...}: {
     imports = [
       self.nixosModules.laptopHardware
-      self.nixosModules.base
+      self.nixosModules.core
+      self.nixosModules.desktop
       self.nixosModules.mangowm
       self.nixosModules.wireguard
       self.nixosModules.laptopFeatures
       self.nixosModules.nvidia
-      self.nixosModules.services
+      self.nixosModules.tailscale
+      self.nixosModules.mullvad
+      self.nixosModules.ollama
+      self.nixosModules.virtualisation
+      self.nixosModules.printing
+      self.nixosModules.gamingHardware
       self.nixosModules.desktopApps
       self.nixosModules.dev
       self.nixosModules.security

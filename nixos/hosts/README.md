@@ -1,128 +1,28 @@
-# Machine definitions in nixos/hosts/
+# Host definitions (`nixos/hosts/`)
 
-Each subdirectory in `nixos/hosts/<hostname>/` defines a machine configuration exposed as `flake.nixosConfigurations.<hostname>`.
+Each subdirectory under `nixos/hosts/<name>/` defines a `flake.nixosConfigurations.<name>` target.
 
-## Hosts comparison
+## Supported hosts
 
-| Feature | Virtual machine (`#vm`) | Physical laptop (`#laptop`) |
-| :--- | :--- | :--- |
-| Target architecture | QEMU / KVM virtual machine | Physical laptop workstation |
-| Bootloader | GRUB (`boot.loader.grub.device = "/dev/vda"`) | UEFI systemd-boot (`boot.loader.systemd-boot`) |
-| Boot limit | Last 10 generations | Last 10 generations |
-| Kernel | `linuxPackages_latest` | `linuxPackages_latest` |
-| SSH daemon (`sshd`) | Enabled (`services.openssh.enable = true`) | Disabled (`services.openssh.enable = false`) |
-| Graphics | Virtual display (QXL / Bochs / VirtIO) | Nvidia proprietary with PRIME offload |
-| Display manager | SDDM with Catppuccin Mocha theme | SDDM with Catppuccin Mocha theme |
-| Desktop session | MangoWM with Noctalia floating bar | MangoWM with Noctalia floating bar |
-| Power management | Disabled | UPower, `power-profiles-daemon`, lid switch suspend |
-| Bluetooth | Disabled | BlueZ and Blueman applet (`services.blueman`) |
-| Development suite | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) | Full (Python uv, Go, Rust, PHP, JDK 21, LaTeX) |
-| Security suite | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) | Full (Ghidra, Pwndbg, Sage, Wireshark, Burp) |
-| Gaming | Steam and GameMode | Steam, GameMode, Nvidia offload |
+| Host | Arch | Boot / Disk | Included stack |
+| :--- | :--- | :--- | :--- |
+| `laptop` | `x86_64-linux` | `systemd-boot`, LUKS + Btrfs (`hardware.nix` + `_disko.nix`) | `core`, `desktop`, `mangowm`, `nvidia`, `laptopFeatures`, `wireguard`, `tailscale`, `mullvad`, `ollama`, `virtualisation`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `security`, `gaming` |
+| `desktop` | `x86_64-linux` | `systemd-boot`, `disko` Btrfs (`_disko.nix`) | `core`, `desktop`, `mangowm`, `wireguard`, `tailscale`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `gaming` |
+| `vm` | `x86_64-linux` | GRUB (`/dev/vda`), `qemu-guest`, SPICE, `_disko.nix` | `core`, `desktop`, `mangowm`, `wireguard`, `desktopApps`, `dev`, `security`, `vscode-server` |
+| `vm-minimal` | `x86_64-linux` | GRUB + EFI, `disko` ext4 (`_disko.nix`) | `core`, `homeManagerCore`, `qemuGuest` |
+| `server` | `x86_64-linux` | `systemd-boot`, `disko` Btrfs (`_disko.nix`) | `core`, `homeManagerCore`, `docker`, `tailscale`, firewall + hardened SSH |
+| `raspberrypi` | `aarch64-linux` | `sd-image-aarch64` + `nixos-hardware` Pi 4 | `core`, `homeManagerCore`, `tailscale`, `docker`, firewall + hardened SSH |
+| `iso` | `x86_64-linux` | `installation-cd-minimal` | `core`, `disko`, partitioning/rescue tools |
 
-## Host file structure
+## Files inside a host directory
 
-Each host uses three files:
+- `default.nix`: Declares `flake.nixosConfigurations.<name>` (and optional `perSystem.packages` like `raspberrypi-sd` or `iso`).
+- `configuration.nix`: Imports feature modules and sets host-specific overrides (`networking.hostName`, bootloader, firewall).
+- `hardware.nix` / `_disko.nix`: Hardware scan or `disko` disk layout. Prefixing `_disko.nix` with `_` prevents `flake.nix` from auto-importing it as a `flake-parts` module.
 
-```text
-nixos/hosts/<hostname>/
-├── default.nix          # Flake output definition (nixosSystem call)
-├── configuration.nix    # Feature module imports and host overrides
-└── hardware.nix         # Hardware scan (filesystems, kernel modules, CPU microcode)
-```
+## Adding a new host
 
-### 1. default.nix
-Builds the system with `inputs.nixpkgs.lib.nixosSystem`:
-```nix
-{
-  inputs,
-  self,
-  ...
-}: {
-  flake.nixosConfigurations.myhost = inputs.nixpkgs.lib.nixosSystem {
-    specialArgs = {inherit inputs self;};
-    modules = [
-      self.nixosModules.myhostConfiguration
-    ];
-  };
-}
-```
-
-### 2. configuration.nix
-Declares `flake.nixosModules.<hostname>Configuration`, selecting features and setting host options:
-```nix
-{self, ...}: {
-  flake.nixosModules.myhostConfiguration = {pkgs, ...}: {
-    imports = [
-      self.nixosModules.myhostHardware
-      self.nixosModules.base
-      self.nixosModules.mangowm
-      self.nixosModules.desktopApps
-      self.nixosModules.dev
-      self.nixosModules.security
-    ];
-
-    networking.hostName = "myhost";
-
-    boot.loader.systemd-boot.enable = true;
-    boot.loader.systemd-boot.configurationLimit = 10;
-    boot.loader.efi.canTouchEfiVariables = true;
-    boot.kernelPackages = pkgs.linuxPackages_latest;
-  };
-}
-```
-
-### 3. hardware.nix
-Contains hardware-specific configuration from `nixos-generate-config --show-hardware-config`:
-```nix
-{
-  flake.nixosModules.myhostHardware = {
-    config,
-    lib,
-    pkgs,
-    modulesPath,
-    ...
-  }: {
-    # Generated hardware configuration...
-  };
-}
-```
-
-## Provisioning with bootstrap.sh
-
-To provision a new machine:
-```bash
-# Interactive setup:
-bash bootstrap.sh
-
-# Non-interactive for the laptop:
-bash bootstrap.sh --host laptop
-```
-
-The script:
-1. Detects hardware devices and generates `hardware.nix`.
-2. Backs up existing configuration.
-3. Prompts for user passwords.
-4. Checks flake formatting and evaluation.
-5. Rebuilds and activates the system.
-
-## Adding a new host manually
-
-1. Create the host directory:
-   ```bash
-   mkdir -p nixos/hosts/my-desktop
-   ```
-2. Generate the hardware scan:
-   ```bash
-   nixos-generate-config --show-hardware-config > nixos/hosts/my-desktop/hardware.nix
-   ```
-   Wrap the output in `{ flake.nixosModules.myDesktopHardware = { config, lib, pkgs, modulesPath, ... }: { ... }; }`.
-3. Create `configuration.nix` and `default.nix` using the templates above.
-4. Stage files in Git:
-   ```bash
-   git add nixos/hosts/my-desktop
-   ```
-5. Apply configuration:
-   ```bash
-   sudo nixos-rebuild switch --flake .#my-desktop
-   ```
+1. Create `nixos/hosts/<name>/default.nix`, `configuration.nix`, and `_disko.nix` (or `hardware.nix`).
+2. Stage the new directory with `git add nixos/hosts/<name>`.
+3. Verify evaluation with `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath`.
+4. Add `<name>` to `.github/workflows/check.yml` and `bootstrap.sh`.

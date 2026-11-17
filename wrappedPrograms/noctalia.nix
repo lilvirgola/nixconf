@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{...}: {
   perSystem = {pkgs, ...}: let
     configDir = pkgs.runCommand "noctalia-config-dir" {} ''
       mkdir -p $out/noctalia

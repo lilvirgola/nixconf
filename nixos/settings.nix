@@ -18,9 +18,23 @@
       };
 
       initialPassword = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nullOr lib.types.str;
         default = "nixos";
-        description = "Initial default password for the primary user account.";
+        description = "Initial default password for the primary user account (set null when using hashedPassword or SSH keys only).";
+      };
+
+      sshAuthorizedKeys = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKXpAYYAl+vHTkska3A+8YQG7SWLjw8UUSRNnwS0RfNo virgola@virgola-laptop"
+        ];
+        description = "SSH public keys authorized for the primary user account.";
+      };
+
+      enableCuda = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Whether CUDA acceleration is available on this host (enabled automatically by nvidia module).";
       };
 
       timezone = lib.mkOption {

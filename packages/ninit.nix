@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{...}: {
   perSystem = {pkgs, ...}: let
     pythonEnv = pkgs.python3.withPackages (p: [
       p.rich

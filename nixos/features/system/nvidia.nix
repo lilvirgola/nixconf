@@ -4,6 +4,8 @@
     pkgs,
     ...
   }: {
+    custom.enableCuda = true;
+
     # Accelerated Graphics Driver & 32-bit libraries for Steam/Wine
     hardware.graphics = {
       enable = true;

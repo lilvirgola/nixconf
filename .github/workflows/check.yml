@@ -22,3 +22,10 @@ jobs:
       - name: Run nix flake check
         run: nix flake check
 
+      - name: Evaluate all NixOS configurations
+        run: |
+          for host in laptop desktop vm vm-minimal server raspberrypi iso; do
+            echo "Evaluating nixosConfigurations.$host..."
+            nix eval ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
+          done
+

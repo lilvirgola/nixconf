@@ -1,8 +1,4 @@
-{
-  self,
-  lib,
-  ...
-}: let
+{...}: let
   # Factory to build Antigravity packages against a given pkgs instance
   mkAntigravityPackages = pkgs: let
     baseIde = pkgs.antigravity-ide.override {
@@ -145,7 +141,7 @@ in {
       ];
 
       nixpkgs.overlays = [
-        (final: prev: let
+        (_final: prev: let
           p = mkAntigravityPackages prev;
         in {
           antigravity-ide = p.ide;

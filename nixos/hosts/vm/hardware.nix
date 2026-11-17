@@ -1,12 +1,6 @@
-{
-  self,
-  inputs,
-  ...
-}: {
+{...}: {
   flake.nixosModules.vmHardware = {
-    config,
     lib,
-    pkgs,
     modulesPath,
     ...
   }: {
