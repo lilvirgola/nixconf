@@ -48,15 +48,6 @@ in {
     settings.init.defaultBranch = "main";
   };
 
-  programs.ssh = {
-    enable = true;
-    enableDefaultConfig = false;
-    settings."*" = {
-      forwardAgent = true;
-      addKeysToAgent = "yes";
-    };
-  };
-
   programs.zsh = {
     enable = true;
     enableCompletion = true;

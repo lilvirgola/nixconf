@@ -84,7 +84,14 @@
       self.packages.${pkgs.stdenv.hostPlatform.system}.ssh-vault
     ];
 
-    programs.ssh.startAgent = true;
+    programs.ssh = {
+      startAgent = true;
+      extraConfig = ''
+        Host *
+          ForwardAgent yes
+          AddKeysToAgent yes
+      '';
+    };
     systemd.user.settings.Manager.DefaultEnvironment = "SSH_AUTH_SOCK=%t/ssh-agent";
     systemd.user.services.ssh-agent.postStart = "${pkgs.systemd}/bin/systemctl --user set-environment SSH_AUTH_SOCK=%t/ssh-agent";
 
