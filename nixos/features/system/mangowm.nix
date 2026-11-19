@@ -8,9 +8,13 @@
       self.nixosModules.noctalia
     ];
 
+    # Use X11 for the SDDM greeter so multi-monitor (eDP-1 + HDMI) and sddm-astronaut-theme
+    # render across all connected displays; MangoWM still launches as a Wayland session.
+    services.xserver.enable = true;
+
     services.displayManager.sddm = {
       enable = true;
-      wayland.enable = lib.mkDefault true;
+      wayland.enable = lib.mkDefault false;
       package = pkgs.kdePackages.sddm;
       theme = "sddm-astronaut-theme";
       extraPackages = with pkgs.kdePackages; [

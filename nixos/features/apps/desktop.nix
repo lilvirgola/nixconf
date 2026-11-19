@@ -83,6 +83,7 @@
       # Files, PDFs, Graphics & Screenshots
       gimp
       inkscape
+      imv
       blenderPkg
       yazi
       zathura

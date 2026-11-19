@@ -17,3 +17,4 @@ nix build .#keyhints
 - `ssh-vault` ([ssh-vault.nix](./ssh-vault.nix)): Provides `ssh-vault-load`, `ssh-vault-add`, and `ssh-vault-list` to store and load SSH keys from Bitwarden/Vaultwarden (`rbw` or `bw`) into `ssh-agent`.
 - `mtp` ([mtp.nix](./mtp.nix)): Interactive Many-Time Pad XOR cryptanalysis tool (`mtp ciphertexts.txt -o decrypted.json`).
 - `tunnelmole` ([tunnelmole.nix](./tunnelmole.nix)): Reverse tunnel client (`tmole 8080`).
+- `deploy` ([deploy.nix](./deploy.nix)): Remote NixOS deployment wrapper around `nixos-rebuild --target-host` (`deploy server`, `deploy raspberrypi`).

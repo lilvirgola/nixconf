@@ -36,5 +36,9 @@
         nvidiaBusId = "PCI:1:0:0";
       };
     };
+
+    environment.systemPackages = with pkgs; [
+      mesa-demos
+    ];
   };
 }

@@ -37,6 +37,88 @@
         description = "Whether CUDA acceleration is available on this host (enabled automatically by nvidia module).";
       };
 
+      git = {
+        userName = lib.mkOption {
+          type = lib.types.str;
+          default = "virgola";
+          description = "Git author/committer name.";
+        };
+
+        userEmail = lib.mkOption {
+          type = lib.types.str;
+          default = "alessandro.debiasi@protonmail.com";
+          description = "Git author/committer email.";
+        };
+
+        defaultBranch = lib.mkOption {
+          type = lib.types.str;
+          default = "main";
+          description = "Default branch name for new Git repositories.";
+        };
+      };
+
+      apps = {
+        browser = lib.mkOption {
+          type = lib.types.str;
+          default = "firefox";
+          description = "Default $BROWSER command.";
+        };
+
+        browserDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "firefox.desktop";
+          description = "Desktop entry for HTTP/HTTPS/HTML.";
+        };
+
+        editor = lib.mkOption {
+          type = lib.types.str;
+          default = "nvim";
+          description = "Default $EDITOR command.";
+        };
+
+        editorDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "antigravity-ide.desktop";
+          description = "Desktop entry for plain text and source files.";
+        };
+
+        terminal = lib.mkOption {
+          type = lib.types.str;
+          default = "kitty";
+          description = "Default $TERMINAL and XFCE TerminalEmulator helper.";
+        };
+
+        fileManagerDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "thunar.desktop";
+          description = "Desktop entry for directories.";
+        };
+
+        pdfViewerDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "org.pwmt.zathura.desktop";
+          description = "Desktop entry for PDF/DjVu/PostScript documents.";
+        };
+
+        imageViewerDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "imv.desktop";
+          description = "Desktop entry for images.";
+        };
+
+        mediaPlayerDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "mpv.desktop";
+          description = "Desktop entry for audio and video files.";
+        };
+
+        calendarDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "org.gnome.Calendar.desktop";
+          description = "Desktop entry for calendar events.";
+        };
+      };
+
       timezone = lib.mkOption {
         type = lib.types.str;
         default = "Europe/Rome";

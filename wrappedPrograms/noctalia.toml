@@ -25,8 +25,8 @@ order = [ "default" ]
     shadow = true
     background_opacity = 0.93
     start = [ "launcher", "active_window" ]
-    center = [ "workspaces" ]
-    end = [ "media", "tray", "volume", "andrewdems/vpn-manager:bar", "network", "bluetooth", "clock", "control-center", "session" ]
+    center = [ "taskbar" ]
+    end = [ "media", "tray", "volume", "andrewdems/vpn-manager:bar", "network", "bluetooth", "battery", "clock", "control-center", "session" ]
 
 [widget.workspaces]
 type = "workspaces"
@@ -41,6 +41,14 @@ type = "launcher"
 
 [widget.active_window]
 type = "active_window"
+
+[widget.taskbar]
+type = "taskbar"
+group_by_workspace = true
+show_workspace_label = true
+hide_empty_workspaces = true
+workspace_group_capsule = true
+only_active_workspace = false
 
 [widget.clock]
 type = "clock"
@@ -59,6 +67,9 @@ show_vpn_label = true
 
 [widget.bluetooth]
 type = "bluetooth"
+
+[widget.battery]
+type = "battery"
 
 [widget.control-center]
 type = "control-center"

@@ -82,6 +82,7 @@
       self.packages.${pkgs.stdenv.hostPlatform.system}.ninit
       self.packages.${pkgs.stdenv.hostPlatform.system}.kssh
       self.packages.${pkgs.stdenv.hostPlatform.system}.ssh-vault
+      self.packages.${pkgs.stdenv.hostPlatform.system}.deploy
     ];
 
     programs.ssh = {

@@ -44,6 +44,12 @@ nix build .#packages.aarch64-linux.raspberrypi-sd
 zstdcat result/sd-image/*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
+On first boot, Ethernet works via DHCP. To connect over Wi-Fi (`NetworkManager` is enabled):
+
+```bash
+nmcli device wifi connect "<YOUR_WIFI_SSID>" password "<YOUR_WIFI_PASSWORD>"
+```
+
 ---
 
 ## 1. Pre-Installation Checklist
@@ -241,7 +247,7 @@ Check that the integrated GPU powers the desktop while the NVIDIA GPU powers on-
 nvidia-smi
 
 # Test on-demand GPU offload
-prime-run glxinfo | grep "OpenGL renderer"
+nvidia-offload glxinfo | grep "OpenGL renderer"
 ```
 
 ### 2. On-Demand Ollama (0 VRAM Idle)

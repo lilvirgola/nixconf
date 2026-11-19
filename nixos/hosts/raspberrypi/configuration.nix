@@ -20,13 +20,16 @@
 
     nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
     networking.hostName = "raspberrypi";
-    networking.useDHCP = lib.mkDefault true;
+    networking.networkmanager.enable = true;
 
     # Disable nix-ld on aarch64 headless Pi unless needed; keep memory footprint lean
     programs.nix-ld.enable = lib.mkForce false;
 
     # Hardened SSH: key-only auth and no default initial password
-    users.users.${config.custom.username}.initialPassword = lib.mkForce null;
+    users.users.${config.custom.username} = {
+      extraGroups = ["networkmanager"];
+      initialPassword = lib.mkForce null;
+    };
     services.openssh.settings.PasswordAuthentication = config.custom.sshAuthorizedKeys == [];
 
     networking.firewall = {

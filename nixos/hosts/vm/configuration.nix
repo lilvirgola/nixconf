@@ -51,9 +51,6 @@
         "-vga"
         "virtio"
       ];
-      # Run SDDM greeter via X11 inside VM so Astronaut theme renders reliably without Weston DRM crashes
-      services.xserver.enable = true;
-      services.displayManager.sddm.wayland.enable = false;
     };
 
     # Fix display, software rasterizer & cursor in QEMU with wlroots compositors

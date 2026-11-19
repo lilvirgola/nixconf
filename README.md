@@ -84,6 +84,10 @@ nix flake check
 nix build .#vm
 nix run .#vm-minimal
 
+# Deploy remotely over SSH / Tailscale
+nix run .#deploy -- server
+nix run .#deploy -- raspberrypi virgola@raspberrypi --remote-build
+
 # Build Raspberry Pi 4 SD image (on aarch64-linux or with binfmt)
 nix build .#raspberrypi-sd
 
