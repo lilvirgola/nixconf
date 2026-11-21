@@ -13,7 +13,12 @@
     grim = lib.getExe pkgs.grim;
     slurp = lib.getExe pkgs.slurp;
     swappy = lib.getExe pkgs.swappy;
+    jq = lib.getExe pkgs.jq;
 
+    forceKill = pkgs.writeShellScript "niri-force-kill" ''
+      pid=$(niri msg -j focused-window | ${jq} -r '.pid // empty')
+      [ -n "$pid" ] && kill -9 "$pid"
+    '';
     screenshotSwappy = pkgs.writeShellScript "niri-screenshot-swappy" ''
       ${grim} -g "$(${slurp})" - | ${swappy} -f -
     '';
@@ -57,6 +62,7 @@
 
           # Windows & Columns
           "Mod+Q".close-window = [];
+          "Mod+Shift+Q".spawn-sh = toString forceKill;
           "Mod+F".fullscreen-window = [];
           "Mod+Space".toggle-window-floating = [];
           "Mod+R".switch-preset-column-width = [];

@@ -87,6 +87,10 @@
       hint = "Windows|SUPER + Q|Close Active Window (killclient)|none";
     }
     {
+      bind = "SUPER+SHIFT,q,killclient,force";
+      hint = "Windows|SUPER + SHIFT + Q|Force Kill Active Window (SIGKILL)|none";
+    }
+    {
       bind = "SUPER,r,reload_config";
       hint = "Windows|SUPER + R|Reload Compositor Configuration|none";
     }

@@ -106,6 +106,7 @@ Press `SUPER + H` to open the searchable `keyhints` menu (`rofi`), or run `keyhi
 | `SUPER + B` | Open Firefox |
 | `SUPER + E` | Open Thunar |
 | `SUPER + Q` | Close active window |
+| `SUPER + Shift + Q` | Force kill active window (`SIGKILL`) |
 | `SUPER + Space` | Toggle floating |
 | `SUPER + F` | Toggle fullscreen |
 | `SUPER + N` | Cycle layout (`tile`, `scroller`, `grid`) |

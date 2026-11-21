@@ -68,6 +68,9 @@ show_vpn_label = true
 [widget.bluetooth]
 type = "bluetooth"
 
+[widget.bluetooth.actions]
+left = "exec blueman-manager"
+
 [widget.battery]
 type = "battery"
 
