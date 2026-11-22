@@ -24,6 +24,7 @@
       self.nixosModules.dev
       self.nixosModules.gaming
       self.nixosModules.vr
+      self.nixosModules.android
     ];
 
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

@@ -1,4 +1,4 @@
-{
+{self, ...}: {
   flake.nixosModules.vr = {
     config,
     pkgs,
@@ -10,6 +10,10 @@
       then pkgs.wivrn.override {cudaSupport = true;}
       else pkgs.wivrn;
   in {
+    imports = [
+      self.nixosModules.android
+    ];
+
     # Wireless PCVR streaming for Meta Quest 3 (start on-demand via `wivrn-dashboard`)
     services.wivrn = {
       enable = true;
@@ -28,10 +32,20 @@
     # Ensure mDNS discovery port is open even on hosts without printing enabled
     services.avahi.openFirewall = lib.mkDefault true;
 
-    # OpenVR-to-OpenXR compatibility layer and ADB tooling for wired USB Quest debugging/tethering
+    # Virtual desktop overlay and OpenVR-to-OpenXR compatibility
     environment.systemPackages = with pkgs; [
+      wayvr
       xrizer
-      android-tools
     ];
+
+    # Point Steam OpenVR runtime to xrizer so OpenVR games run through WiVRn/OpenXR
+    home-manager.users.${config.custom.username}.xdg.configFile."openvr/openvrpaths.vrpath".text = builtins.toJSON {
+      config = ["/home/${config.custom.username}/.local/share/Steam/config"];
+      external_drivers = null;
+      jsonid = "vrpathreg";
+      log = ["/home/${config.custom.username}/.local/share/Steam/logs"];
+      runtime = ["${pkgs.xrizer}/lib/xrizer"];
+      version = 1;
+    };
   };
 }

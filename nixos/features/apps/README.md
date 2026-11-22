@@ -28,6 +28,12 @@ Application suites exposed as `flake.nixosModules.<name>`.
 - Installs `heroic`, `lutris`, `chiaki-ng`, `prismlauncher`, `mangohud`, `protontricks`, `winetricks`, and `wineWow64Packages.waylandFull`.
 
 ### `vr.nix` (`flake.nixosModules.vr`)
+- Imports `android` so `adb` is available for wired Quest 3 tethering and sideloading.
 - Enables `services.wivrn` for Meta Quest 3 PCVR streaming (`autoStart = false`, `openFirewall = true`, `highPriority = true`, `steam.importOXRRuntimes = true`). Start the server on demand with `wivrn-dashboard`.
 - Enables CUDA encoding (`cudaSupport = true`) and Nvidia PRIME offload env vars in `monadoEnvironment` when `custom.enableCuda` is true.
-- Ensures Avahi mDNS firewall port is open and installs `xrizer` (OpenVR-to-OpenXR) and `android-tools` (`adb` for wired USB tethering and sideloading).
+- Ensures Avahi mDNS firewall port is open, installs `wayvr` (virtual Linux desktop inside VR, selectable as the startup app in `wivrn-dashboard`) and `xrizer`, and writes `~/.config/openvr/openvrpaths.vrpath` pointing to `${pkgs.xrizer}/lib/xrizer`.
+
+### `android.nix` (`flake.nixosModules.android`)
+- Device connection and file transfer: `android-tools` (`adb`, `fastboot`), `scrcpy`, `android-file-transfer`, and `gnirehtet` (USB reverse tethering).
+- APK inspection and instrumentation: `apktool`, `apksigner`, and `frida-tools`.
+- Device maintenance and firmware: `universal-android-debloater`, `payload-dumper-go`, and `heimdall`.

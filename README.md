@@ -32,14 +32,14 @@ nixconf/
 ├── home/                      # Home Manager modules (core CLI + desktop dotfiles)
 ├── wrappedPrograms/           # Standalone wrapped apps (myKitty, myMango, myNiri, myNoctalia)
 ├── packages/                  # Custom packages (ninit, keyhints, kssh, ssh-vault, mtp, tunnelmole)
-├── templates/                 # 26 project templates for `ninit` / `nix flake init`
+├── templates/                 # 27 project templates for `ninit` / `nix flake init`
 ├── nixos/
 │   ├── settings.nix           # User identity, SSH keys, locale, and theme options
 │   ├── features/
 │   │   ├── core/              # Headless-safe base OS, Home Manager wiring, desktop base
 │   │   ├── system/            # Display sessions & hardware (mangowm, niri, noctalia, laptop, nvidia, wireguard)
 │   │   ├── services/          # Single-purpose services (tailscale, mullvad, ollama, docker, virtualisation, printing)
-│   │   └── apps/              # desktopApps, dev (lean), security, gaming, antigravity
+│   │   └── apps/              # desktopApps, dev (lean), security, gaming, vr, android, antigravity
 │   └── hosts/                 # Per-machine assemblies and _disko.nix layouts
 └── .github/workflows/         # CI flake check, host evaluation, and weekly lockfile updates
 ```

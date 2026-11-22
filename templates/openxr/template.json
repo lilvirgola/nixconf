@@ -1,0 +1,13 @@
+{
+  "name": "openxr",
+  "aliases": [
+    "vr",
+    "xr",
+    "godot",
+    "godot-vr"
+  ],
+  "description": "OpenXR and VR development workspace with Godot 4, OpenXR loader, Vulkan, C/C++, and Rust",
+  "category": "Systems & General Purpose",
+  "run": "godot4"
+}
+

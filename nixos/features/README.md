@@ -7,7 +7,7 @@ Modules under `nixos/features/` are auto-discovered by `flake.nix` and exposed a
 - `core/`: `base.nix` (`core`, headless-safe OS), `desktop.nix` (`desktop`, audio/fonts/NetworkManager/Polkit/terminals), `home-manager.nix` (`homeManagerCore`, `homeManagerDesktop`).
 - `system/`: `mangowm.nix`, `niri.nix`, `noctalia.nix`, `laptop.nix` (`laptopFeatures`), `nvidia.nix`, `wireguard.nix` (also aliased as `vpn`).
 - `services/`: `tailscale.nix`, `mullvad.nix`, `ollama.nix`, `docker.nix`, `virtualisation.nix`, `printing.nix`, `gaming-hardware.nix` (`gamingHardware`).
-- `apps/`: `desktop.nix` (`desktopApps`), `dev.nix` (`dev`), `security.nix` (`security`), `gaming.nix` (`gaming`), `vr.nix` (`vr`), `antigravity.nix` (`antigravity`).
+- `apps/`: `desktop.nix` (`desktopApps`), `dev.nix` (`dev`), `security.nix` (`security`), `gaming.nix` (`gaming`), `vr.nix` (`vr`), `android.nix` (`android`), `antigravity.nix` (`antigravity`).
 
 ## Conventions
 

@@ -15,6 +15,7 @@ ninit
 # Direct template initialization:
 ninit rust my-crate          # Scaffolds Rust template in ./my-crate
 ninit rust-gui my-gpui-app   # Scaffolds Rust GUI (GPUI, Bevy, Egui) in ./my-gpui-app
+ninit openxr my-vr-app       # Scaffolds OpenXR/Godot 4 VR workspace in ./my-vr-app
 ninit zig my-zig-app         # Scaffolds Zig and ZLS template in ./my-zig-app
 ninit typst my-doc           # Scaffolds Typst and Tinymist template in ./my-doc
 ninit py my-fastapi          # Scaffolds Python uv template in ./my-fastapi
@@ -54,6 +55,7 @@ ninit ctf-full my-all-in-one # Scaffolds full CTF workspace in ./my-all-in-one
 ### Systems and general purpose
 - `rust`: Cargo, rustc, rust-analyzer, clippy, rustfmt, OpenSSL, starter `Cargo.toml` and `src/main.rs`.
 - `rust-gui`: Rust GUI and game development (GPUI, Bevy, Egui, Winit) configured with Wayland, Vulkan, libxkbcommon, Fontconfig, and `LD_LIBRARY_PATH`.
+- `openxr`: OpenXR and VR development workspace with Godot 4 (`godot_4`), `openxr-loader`, Vulkan headers/loader/tools, C/C++, and Rust.
 - `zig`: Zig compiler, `zls` language server, GDB, starter `build.zig` and `src/main.zig`.
 - `c-cpp`: Clang, GCC, CMake, Ninja, GDB, Valgrind, `clang-tools` (clangd, clang-format).
 - `go`: Go, `gopls` language server, `golangci-lint`, `delve` debugger, starter `go.mod` and `main.go`.

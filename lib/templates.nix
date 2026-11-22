@@ -16,6 +16,14 @@
       path = ../templates/rust-gui;
       description = "Rust GUI & game dev project (GPUI, Bevy, Egui, Winit) with Wayland, Vulkan, and fontconfig";
     };
+    openxr = {
+      path = ../templates/openxr;
+      description = "OpenXR and VR development workspace with Godot 4, OpenXR loader, Vulkan, C/C++, and Rust";
+    };
+    vr = {
+      path = ../templates/openxr;
+      description = "Alias for openxr";
+    };
     zig = {
       path = ../templates/zig;
       description = "Zig project with zig compiler, zls language server, and GDB";

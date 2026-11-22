@@ -75,7 +75,6 @@
       playerctl
       brightnessctl
       gparted
-      scrcpy
     ];
   };
 }
