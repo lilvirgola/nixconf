@@ -16,20 +16,11 @@
 
     programs.gamemode.enable = true;
 
-    nixpkgs.config.permittedInsecurePackages = [
-      "sidequest-1.4.1"
-    ];
-    nixpkgs.config.problems.handlers = {
-      "gtk+".broken = "ignore";
-    };
-
     environment.systemPackages = with pkgs; [
       heroic
       lutris
       chiaki-ng
       prismlauncher
-      sidequest
-      dualsensectl
       mangohud
       protontricks
       winetricks

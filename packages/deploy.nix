@@ -30,7 +30,7 @@
         host="$1"
         shift
 
-        target="virgola@$host"
+        target="''${USER:-virgola}@$host"
         action="switch"
         remote_build=false
 

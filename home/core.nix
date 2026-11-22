@@ -28,6 +28,12 @@ in {
 
   programs.home-manager.enable = true;
 
+  home.packages = with pkgs; [
+    zsh-completions
+  ];
+
+  xdg.configFile."fastfetch/config.jsonc".source = fastfetchConfig;
+
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;

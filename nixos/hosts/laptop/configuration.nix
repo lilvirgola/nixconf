@@ -18,6 +18,7 @@
       self.nixosModules.dev
       self.nixosModules.security
       self.nixosModules.gaming
+      self.nixosModules.vr
     ];
 
     networking.hostName = "laptop";

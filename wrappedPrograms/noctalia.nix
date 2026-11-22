@@ -14,7 +14,7 @@
         postBuild = ''
           wrapProgram $out/bin/noctalia \
             --set-default NOCTALIA_CONFIG_HOME "${configDir}" \
-            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [zenity networkmanager networkmanagerapplet])}
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [zenity networkmanager])}
         '';
       })
       .overrideAttrs (old: {

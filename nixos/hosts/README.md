@@ -6,8 +6,8 @@ Each subdirectory under `nixos/hosts/<name>/` defines a `flake.nixosConfiguratio
 
 | Host | Arch | Boot / Disk | Included stack |
 | :--- | :--- | :--- | :--- |
-| `laptop` | `x86_64-linux` | `systemd-boot`, LUKS + Btrfs (`hardware.nix` + `_disko.nix`) | `core`, `desktop`, `mangowm`, `nvidia`, `laptopFeatures`, `wireguard`, `tailscale`, `mullvad`, `ollama`, `virtualisation`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `security`, `gaming` |
-| `desktop` | `x86_64-linux` | `systemd-boot`, `disko` Btrfs (`_disko.nix`) | `core`, `desktop`, `mangowm`, `wireguard`, `tailscale`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `gaming` |
+| `laptop` | `x86_64-linux` | `systemd-boot`, LUKS + Btrfs (`hardware.nix` + `_disko.nix`) | `core`, `desktop`, `mangowm`, `nvidia`, `laptopFeatures`, `wireguard`, `tailscale`, `mullvad`, `ollama`, `virtualisation`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `security`, `gaming`, `vr` |
+| `desktop` | `x86_64-linux` | `systemd-boot`, `disko` Btrfs (`_disko.nix`) | `core`, `desktop`, `mangowm`, `wireguard`, `tailscale`, `printing`, `gamingHardware`, `desktopApps`, `dev`, `gaming`, `vr` |
 | `vm` | `x86_64-linux` | GRUB (`/dev/vda`), `qemu-guest`, SPICE, `_disko.nix` | `core`, `desktop`, `mangowm`, `wireguard`, `desktopApps`, `dev`, `security`, `vscode-server` |
 | `vm-minimal` | `x86_64-linux` | GRUB + EFI, `disko` ext4 (`_disko.nix`) | `core`, `homeManagerCore`, `qemuGuest` |
 | `server` | `x86_64-linux` | `systemd-boot`, `disko` Btrfs (`_disko.nix`) | `core`, `homeManagerCore`, `docker`, `tailscale`, firewall + hardened SSH |

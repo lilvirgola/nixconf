@@ -26,7 +26,6 @@
 
     environment.systemPackages = with pkgs; [
       sddm-astronaut
-      bibata-cursors
       rofi
     ];
 

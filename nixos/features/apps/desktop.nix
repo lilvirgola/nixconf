@@ -56,7 +56,6 @@
       # GTK Themes & Icons
       adw-gtk3
       papirus-icon-theme
-      bibata-cursors
       # Web Browsers
       librewolf
 

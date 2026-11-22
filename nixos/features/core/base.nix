@@ -96,11 +96,6 @@
     systemd.user.settings.Manager.DefaultEnvironment = "SSH_AUTH_SOCK=%t/ssh-agent";
     systemd.user.services.ssh-agent.postStart = "${pkgs.systemd}/bin/systemctl --user set-environment SSH_AUTH_SOCK=%t/ssh-agent";
 
-    programs.direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-
     services.openssh = {
       enable = lib.mkDefault true;
       settings = {

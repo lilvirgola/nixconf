@@ -5,5 +5,8 @@
       game-devices-udev-rules
       dualsensectl
     ];
+    environment.systemPackages = with pkgs; [
+      dualsensectl
+    ];
   };
 }

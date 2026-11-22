@@ -1,88 +1,33 @@
-# Wrapped applications in wrappedPrograms/
+# Wrapped applications (`wrappedPrograms/`)
 
-This directory contains standalone program wrappers built using [`BirdeeHub/nix-wrapper-modules`](https://github.com/BirdeeHub/nix-wrapper-modules).
-
-## Wrapper modules design
-
-Wrapped applications bundle their configuration directly into the Nix store derivation:
-1. Self-contained derivations: configuration files, environment variables, dependencies, and CLI flags are built into the package output.
-2. Configuration immutability: the binary runs with fixed settings, avoiding issues with missing dotfiles or broken symlinks.
-3. Portability: wrapped applications can run on any Linux system with Nix:
-   ```bash
-   nix run github:lilvirgola/nixconf#myNoctalia
-   ```
+Standalone wrapped binaries built with [`BirdeeHub/nix-wrapper-modules`](https://github.com/BirdeeHub/nix-wrapper-modules). Each wrapper bundles its configuration inside the Nix store derivation and can be run directly with `nix run .#<package>`.
 
 ## Programs
 
-### 1. myMango ([wrappedPrograms/mangowm.nix](./mangowm.nix))
-Wayland compositor based on `mangowc`:
-- Autostart services:
-  - `myNoctalia` shell daemon.
-  - `polkit-gnome-authentication-agent-1` for GTK privilege prompts.
-  - `wl-clip-persist --clipboard both` so copied data survives closing source windows.
-  - `swayidle` configured to lock the session after 15 minutes (`900s`), suspend after 30 minutes (`1800s`), and lock before sleep.
-- Keyboard configuration:
-  - Italian keyboard layout (`xkb.layout = "it"`).
-  - Tiling layouts: scroller, grid, and master.
-- Keybindings:
-  - `SUPER + Return`: Kitty terminal
-  - `SUPER + H`: keybindings cheatsheet (`keyhints`)
-  - `SUPER + B`: Firefox
-  - `SUPER + E`: Thunar file manager
-  - `SUPER + Space`: toggle window floating
-  - `SUPER + Shift + S`: area screenshot with Swappy
-  - `SUPER + 1..9`: switch workspaces
-  - `Ctrl + Alt + L`: lock screen
+### `myMango` (`wrappedPrograms/mangowm.nix`)
+- Wayland compositor (`mangowc`) configured with Italian keymap (`xkb_rules_layout = "it"`), tap-to-click, blur, and tile/scroller/grid layouts.
+- Autostart daemons: `myNoctalia`, `polkit-gnome-authentication-agent-1`, `wl-clip-persist --clipboard both`, `swayidle` (locks at 15 min, suspends at 30 min, locks before sleep), and `wayland-pipewire-idle-inhibit`.
+- Keybindings are shared with `packages/keyhints.nix` via `wrappedPrograms/_keybindings.nix` so the cheatsheet stays in sync with MangoWM.
 
-### 2. myNoctalia ([wrappedPrograms/noctalia.nix](./noctalia.nix))
-Desktop shell and status bar based on Noctalia v5:
-- Floating bar: configured with top screen margins and rounded borders (`margin-top: 10`, `margin-left: 12`, `margin-right: 12`, `border-radius: 12`).
-- Styling: Catppuccin Mocha color palette.
-- Widgets:
-  - App launcher and taskbar
-  - System monitors (CPU, memory, storage)
-  - Network and Wi-Fi status
-  - Bluetooth device indicator
-  - Audio and volume sliders
-  - Battery indicator and power profile selector
-  - Clock, calendar, and notification center
+### `myNoctalia` (`wrappedPrograms/noctalia.nix` and `noctalia.toml`)
+- Noctalia v5 shell wrapped with `NOCTALIA_CONFIG_HOME` pointing to the built `noctalia.toml` and `zenity`/`networkmanager` in `PATH`.
+- Top floating bar layout:
+  - Start: `launcher`, `active_window`
+  - Center: `taskbar` (`group_by_workspace = true`, `show_workspace_label = true`, `hide_empty_workspaces = true`, `workspace_group_capsule = true`)
+  - End: `media`, `tray`, `volume`, `andrewdems/vpn-manager:bar`, `network`, `bluetooth`, `battery`, `clock`, `control-center`, `session`
 
-### 3. myNiri ([wrappedPrograms/niri.nix](./niri.nix))
-Scrollable-tiling Wayland compositor:
-- Fallback compositor paired with `myNoctalia` and `keyhints`.
-- Horizontal scrollable tiling layout.
+### `myNiri` (`wrappedPrograms/niri.nix`)
+- Scrollable-tiling Wayland compositor fallback paired with `myNoctalia`, `polkit-gnome`, `wl-clip-persist`, and `xwayland-satellite`.
+- Binds launcher (`Mod+D`/`Mod+S`), terminal (`Mod+Return`), browser (`Mod+B`), file manager (`Mod+E`), `keyhints` (`Mod+H`), workspaces `1..9`, column/window focus and move, screenshots (`Mod+Shift+S`, `Print`), volume, media, and brightness keys.
 
-### 4. myKitty ([wrappedPrograms/kitty.nix](./kitty.nix))
-Wrapped Kitty terminal emulator:
-- Disables the window close confirmation prompt (`confirm_os_window_close = 0`) when closing windows through `SUPER + Q`.
+### `myKitty` (`wrappedPrograms/kitty.nix`)
+- Kitty terminal wrapped with `confirm_os_window_close = 0`. Kitty SSH configs (`ssh.conf`, `remote_aliases.sh`, `templates/`) live in `home/desktop.nix`.
 
-## Writing a wrapped program
+## Exporting and running
 
-Create `<program>.nix` in this directory:
+Any `.nix` file in this directory (except `_*`-prefixed helpers like `_keybindings.nix`) is auto-imported as a `flake-parts` module.
 
-```nix
-{
-  inputs,
-  self,
-  ...
-}: {
-  perSystem = {
-    pkgs,
-    self',
-    ...
-  }: {
-    packages.myKitty = inputs.wrapper-modules.wrappers.kitty.wrap {
-      inherit pkgs;
-      settings = {
-        font_family = "JetBrainsMono Nerd Font";
-        font_size = 12.0;
-        background_opacity = 0.95;
-      };
-    };
-  };
-}
+```bash
+nix run .#myNoctalia
+nix run .#myKitty
 ```
-
-The program is exported automatically:
-- Command line: `nix run .#myKitty`
-- In NixOS modules: `self.packages.${pkgs.stdenv.hostPlatform.system}.myKitty`
