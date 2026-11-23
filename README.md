@@ -41,7 +41,7 @@ nixconf/
 │   │   ├── services/          # Single-purpose services (tailscale, mullvad, ollama, docker, virtualisation, printing)
 │   │   └── apps/              # desktopApps, dev (lean), security, gaming, vr, android, antigravity
 │   └── hosts/                 # Per-machine assemblies and _disko.nix layouts
-└── .github/workflows/         # CI flake check, host evaluation, and weekly lockfile updates
+└── .github/workflows/         # CI checks, template checks, security scanning, lockfile updates, and image builds
 ```
 
 ## Quick start

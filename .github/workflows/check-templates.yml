@@ -1,0 +1,47 @@
+name: "Check Templates"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "templates/**"
+      - "lib/templates.nix"
+      - ".github/workflows/check-templates.yml"
+  pull_request:
+    paths:
+      - "templates/**"
+      - "lib/templates.nix"
+      - ".github/workflows/check-templates.yml"
+  schedule:
+    # Runs every Sunday at 06:00 UTC
+    - cron: "0 6 * * 0"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check-templates:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v15
+
+      - name: Evaluate all template devShells
+        run: |
+          rev=$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)
+          for flake in templates/*/flake.nix; do
+            dir=$(dirname "$flake")
+            echo "Evaluating $dir..."
+            nix eval --no-write-lock-file --override-input nixpkgs "github:nixos/nixpkgs/$rev" "./$dir#devShells.x86_64-linux.default.drvPath"
+          done

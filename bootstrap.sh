@@ -5,6 +5,8 @@
 # ==============================================================================
 set -euo pipefail
 
+ORIG_ARGS=("$@")
+
 # Colors & Formatting
 BOLD='\033[1m'
 GREEN='\033[0;32m'
@@ -118,7 +120,8 @@ if ! command -v git >/dev/null 2>&1; then
   if ! command -v git >/dev/null 2>&1; then
     if command -v nix-shell >/dev/null 2>&1 && [ -f "$0" ]; then
       info "Entering temporary nix-shell with Git to continue bootstrap..."
-      exec nix-shell -p git --run "bash \"$0\" \"$@\""
+      printf -v cmd '%q ' bash "$0" "${ORIG_ARGS[@]}"
+      exec nix-shell -p git --run "$cmd"
     else
       error "Git could not be installed automatically. Please install Git (e.g. 'nix-shell -p git') and re-run."
       exit 1
@@ -213,19 +216,20 @@ if [ "$GEN_HARDWARE" = true ]; then
   read -r gen_choice
   if [[ ! "$gen_choice" =~ ^[Nn]$ ]]; then
     if command -v nixos-generate-config >/dev/null 2>&1; then
-      ROOT_OPT=""
+      ROOT_OPT=()
       if [ -d "/mnt" ] && mountpoint -q /mnt 2>/dev/null; then
-        ROOT_OPT="--root /mnt"
+        ROOT_OPT=(--root /mnt)
         info "Target filesystem detected at /mnt, using 'nixos-generate-config --root /mnt'..."
       fi
 
-      info "Running 'nixos-generate-config $ROOT_OPT --show-hardware-config'..."
+      info "Running 'nixos-generate-config ${ROOT_OPT[*]} --show-hardware-config'..."
       TMP_HW=$(mktemp)
-      sudo nixos-generate-config $ROOT_OPT --show-hardware-config > "$TMP_HW" 2>/dev/null || true
+      # shellcheck disable=SC2024
+      sudo nixos-generate-config "${ROOT_OPT[@]}" --show-hardware-config > "$TMP_HW" 2>/dev/null || true
 
       # Fallback: if show-hardware-config output is empty, check pre-generated hardware-configuration.nix
       if [ ! -s "$TMP_HW" ]; then
-        if [ -n "$ROOT_OPT" ] && [ -s "/mnt/etc/nixos/hardware-configuration.nix" ]; then
+        if [ "${#ROOT_OPT[@]}" -gt 0 ] && [ -s "/mnt/etc/nixos/hardware-configuration.nix" ]; then
           info "Reading pre-generated /mnt/etc/nixos/hardware-configuration.nix..."
           cat /mnt/etc/nixos/hardware-configuration.nix > "$TMP_HW"
         elif [ -s "/etc/nixos/hardware-configuration.nix" ]; then

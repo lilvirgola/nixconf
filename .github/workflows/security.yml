@@ -1,0 +1,43 @@
+name: "Security Scan"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Runs every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor and upload SARIF
+        uses: zizmorcore/zizmor-action@v0.8.1
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Lint shell scripts
+        run: shellcheck --severity=warning bootstrap.sh .githooks/pre-commit assets/pwn/pwninit-ghidra.sh
+

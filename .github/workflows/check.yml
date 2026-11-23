@@ -5,19 +5,32 @@ on:
     branches:
       - main
   pull_request:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
+        default: ""
+
+permissions: {}
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v15
 
       - name: Run nix flake check
         run: nix flake check
@@ -28,4 +41,3 @@ jobs:
             echo "Evaluating nixosConfigurations.$host..."
             nix eval ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
           done
-

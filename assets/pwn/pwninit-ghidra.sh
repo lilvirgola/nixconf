@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 set -u  # no -e on purpose
 
 PWNINIT_BIN="$(command -v pwninit)"

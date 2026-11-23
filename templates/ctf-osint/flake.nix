@@ -19,17 +19,16 @@
           requests
           httpx
           beautifulsoup4
-          volatility3
-          exiftool
-          holehe
-          socialscan
-          sherlock
-          maigret
         ]);
     in {
       default = pkgs.mkShell {
         packages = with pkgs; [
           pythonEnv
+          volatility3
+          holehe
+          socialscan
+          sherlock
+          maigret
           theharvester
           exiftool
           whois

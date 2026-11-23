@@ -1,0 +1,70 @@
+name: "Build Images"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Image to build"
+        type: choice
+        default: iso
+        options:
+          - iso
+          - raspberrypi-sd
+          - both
+
+permissions: {}
+
+jobs:
+  iso:
+    if: inputs.target == 'iso' || inputs.target == 'both'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v15
+
+      - name: Build custom rescue ISO
+        run: nix build .#iso
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixconf-iso
+          path: result/iso/*.iso
+          retention-days: 7
+
+  raspberrypi-sd:
+    if: inputs.target == 'raspberrypi-sd' || inputs.target == 'both'
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v15
+
+      - name: Build Raspberry Pi 4 SD image
+        run: nix build .#packages.aarch64-linux.raspberrypi-sd
+
+      - name: Upload SD image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixconf-raspberrypi-sd
+          path: result/sd-image/*.img.zst
+          retention-days: 7

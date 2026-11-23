@@ -6,25 +6,60 @@ on:
     # Runs every Monday at 06:00 UTC
     - cron: "0 6 * * 1"
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
-  update-flake-lock:
+  update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      pr_number: ${{ steps.find-pr.outputs.pr_number }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@main
+        uses: DeterminateSystems/update-flake-lock@v29
         with:
+          branch: update-flake-lock
           pr-title: "chore(flake): update flake.lock"
           pr-labels: |
             dependencies
             automated
 
+      - name: Find open update PR
+        id: find-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr=$(gh pr list --head update-flake-lock --state open --json number --jq '.[0].number // ""')
+          echo "pr_number=$pr" >> "$GITHUB_OUTPUT"
+
+  check:
+    needs: update
+    if: needs.update.outputs.pr_number != ''
+    permissions:
+      contents: read
+    uses: ./.github/workflows/check.yml
+    with:
+      ref: update-flake-lock
+
+  merge:
+    needs: [update, check]
+    if: needs.update.outputs.pr_number != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Auto-merge flake.lock PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.update.outputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: gh pr merge "$PR_NUMBER" --repo "$REPO" --squash --delete-branch
