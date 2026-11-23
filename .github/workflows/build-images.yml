@@ -36,7 +36,7 @@ jobs:
         run: nix build .#iso
 
       - name: Upload ISO artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nixconf-iso
           path: result/iso/*.iso
@@ -63,7 +63,7 @@ jobs:
         run: nix build .#packages.aarch64-linux.raspberrypi-sd
 
       - name: Upload SD image artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nixconf-raspberrypi-sd
           path: result/sd-image/*.img.zst
