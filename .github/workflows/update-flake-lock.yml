@@ -18,13 +18,15 @@ jobs:
       pr_number: ${{ steps.find-pr.outputs.pr_number }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
+        uses: DeterminateSystems/determinate-nix-action@4b040423529d49b1a19ba918742e0aa9aa95031a # v3
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v29
+        uses: DeterminateSystems/update-flake-lock@da03c0f078bc4b2c37ee4f7e072d34bf8f188bb3 # v29
         with:
           branch: update-flake-lock
           pr-title: "chore(flake): update flake.lock"
@@ -45,7 +47,7 @@ jobs:
     if: needs.update.outputs.pr_number != ''
     permissions:
       contents: read
-    uses: ./.github/workflows/check.yml
+    uses: $/.github/workflows/check.yml
     with:
       ref: update-flake-lock
 
