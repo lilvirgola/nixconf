@@ -29,8 +29,14 @@
     users.users.${config.custom.username} = {
       extraGroups = ["networkmanager"];
       initialPassword = lib.mkForce null;
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINM5kUX2P605n93HxM5Af6+EsA8R/Hb+NqpiywKsNgye virgola@LaptopVirgola"
+      ];
     };
     services.openssh.settings.PasswordAuthentication = config.custom.sshAuthorizedKeys == [];
+
+    # Silence upstream sd-image-aarch64 ZFS import warning (ZFS is not used on this host)
+    boot.zfs.forceImportRoot = false;
 
     networking.firewall = {
       enable = true;
