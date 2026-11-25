@@ -35,8 +35,14 @@
     };
     services.openssh.settings.PasswordAuthentication = config.custom.sshAuthorizedKeys == [];
 
-    # Silence upstream sd-image-aarch64 ZFS import warning (ZFS is not used on this host)
-    boot.zfs.forceImportRoot = false;
+    # sd-image.nix enables all-hardware (Rockchip/Allwinner modules like dw-hdmi that don't
+    # exist in linux_rpi4) and profiles/base.nix enables ZFS (unnecessary kernel module build).
+    hardware.enableAllHardware = lib.mkForce false;
+    boot.supportedFilesystems.zfs = lib.mkForce false;
+    boot.initrd.availableKernelModules = [
+      "vc4"
+      "uas"
+    ];
 
     networking.firewall = {
       enable = true;
