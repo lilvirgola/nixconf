@@ -38,14 +38,8 @@
       xrizer
     ];
 
-    # Point Steam OpenVR runtime to xrizer so OpenVR games run through WiVRn/OpenXR
-    home-manager.users.${config.custom.username}.xdg.configFile."openvr/openvrpaths.vrpath".text = builtins.toJSON {
-      config = ["/home/${config.custom.username}/.local/share/Steam/config"];
-      external_drivers = null;
-      jsonid = "vrpathreg";
-      log = ["/home/${config.custom.username}/.local/share/Steam/logs"];
-      runtime = ["${pkgs.xrizer}/lib/xrizer"];
-      version = 1;
-    };
+    home-manager.users.${config.custom.username}.imports = [
+      ../../../home/vr.nix
+    ];
   };
 }
